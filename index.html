@@ -1,0 +1,2590 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070d">
+<meta name="color-scheme" content="dark">
+<title>دربی رویایی</title>
+<style>
+:root{
+  --bg0:#05070d; --bg1:#0b1020; --bg2:#141b33;
+  --gold:#f6c453; --ember:#ff6a2b; --ember2:#ffb347;
+  --text:#f4f1ea; --muted:#98a2bf;
+  --glass:rgba(255,255,255,.06); --glass-b:rgba(255,255,255,.13);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:var(--bg0);color:var(--text);overflow:hidden;
+  font-family:"Vazirmatn","IRANSans",Tahoma,system-ui,-apple-system,"Segoe UI",sans-serif;touch-action:manipulation}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+
+/* ---------- پس‌زمینه ---------- */
+#bg{position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(70% 38% at 50% 112%, rgba(255,106,43,.22), transparent 70%),
+    radial-gradient(90% 46% at 50% -12%, rgba(70,110,255,.20), transparent 70%),
+    linear-gradient(180deg,var(--bg1),var(--bg0))}
+#bg::before{content:"";position:absolute;left:50%;bottom:-62vmax;width:124vmax;height:124vmax;transform:translateX(-50%);
+  border:2px solid rgba(255,255,255,.05);border-radius:50%}
+#bg::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(255,255,255,.04)}
+.beam{position:absolute;top:-10%;width:46vmax;height:130%;opacity:.55;filter:blur(2px);
+  background:linear-gradient(180deg,rgba(150,180,255,.16),transparent 70%);transform-origin:top center}
+.beam.l{left:-18vmax;transform:rotate(-16deg);animation:sway 9s ease-in-out infinite alternate}
+.beam.r{right:-18vmax;transform:rotate(16deg);animation:sway 11s ease-in-out infinite alternate-reverse}
+@keyframes sway{from{opacity:.35}to{opacity:.7}}
+#embers{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+
+/* ---------- قاب برنامه ---------- */
+#app{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;height:100dvh;
+  padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+#top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 4px;
+  width:100%;max-width:560px;margin:0 auto}
+.navg{display:flex;gap:8px}
+.icon{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;
+  background:var(--glass);border:1px solid var(--glass-b);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  transition:transform .15s,background .2s,opacity .2s}
+.icon:active{transform:scale(.92)}
+.icon:disabled{opacity:.3;pointer-events:none}
+.icon svg{width:22px;height:22px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#stepLabel{flex:1;text-align:center;line-height:1.25}
+#stepLabel b{display:block;font-size:15px;font-weight:700}
+#stepLabel small{color:var(--muted);font-size:12px}
+.dots{display:flex;justify-content:center;gap:7px;padding:6px 0 2px}
+.dots i{width:7px;height:7px;border-radius:99px;background:rgba(255,255,255,.16);transition:all .3s}
+.dots i.seen{background:rgba(255,179,71,.55)}
+.dots i.on{width:24px;background:linear-gradient(90deg,var(--ember),var(--gold));box-shadow:0 0 12px rgba(255,106,43,.7)}
+
+#stage{position:relative;flex:1;width:100%;max-width:560px;margin:0 auto;min-height:0}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:8px 20px;text-align:center;overflow-y:auto}
+.screen.top{justify-content:flex-start;padding-top:10px;padding-bottom:14px}
+.in-fwd{animation:inFwd .38s cubic-bezier(.2,.8,.2,1) both}
+.in-back{animation:inBack .38s cubic-bezier(.2,.8,.2,1) both}
+.in-first{animation:inFirst .7s ease both}
+@keyframes inFwd{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes inBack{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+@keyframes inFirst{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+#foot{width:100%;max-width:560px;margin:0 auto;padding:10px 20px 18px}
+.cta{position:relative;width:100%;height:56px;border-radius:18px;font-size:18px;font-weight:800;color:#1a0d05;overflow:hidden;
+  background:linear-gradient(135deg,var(--ember2),var(--ember) 55%,#ff3d1f);
+  box-shadow:0 8px 28px rgba(255,106,43,.42),inset 0 1px 0 rgba(255,255,255,.45);
+  transition:transform .15s,filter .2s,opacity .2s}
+.cta:active{transform:scale(.97)}
+.cta:disabled{opacity:.4;filter:grayscale(.5);pointer-events:none;font-size:15px}
+.cta::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-20deg);
+  animation:sheen 4.2s ease-in-out infinite}
+@keyframes sheen{0%,55%{left:-60%}100%{left:130%}}
+
+/* ---------- صفحه‌ی خوش‌آمد ---------- */
+.hero{position:relative;width:min(46vw,176px);aspect-ratio:1;margin-bottom:30px;animation:float 3s ease-in-out infinite}
+.hero::before{content:"";position:absolute;inset:-34%;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,106,43,.5),rgba(255,106,43,.12) 45%,transparent 70%);animation:pulse 2.6s ease-in-out infinite}
+.hero::after{content:"";position:absolute;left:12%;right:12%;bottom:-20px;height:16px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.55),transparent 70%);animation:shadow 3s ease-in-out infinite}
+.ball{position:relative;width:100%;height:100%;animation:spin 22s linear infinite;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes shadow{0%,100%{transform:scale(1);opacity:.9}50%{transform:scale(.78);opacity:.55}}
+@keyframes pulse{0%,100%{opacity:.75;transform:scale(1)}50%{opacity:1;transform:scale(1.08)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.title{margin:6px 0 8px;font-size:clamp(38px,12vw,58px);font-weight:900;line-height:1.1;
+  background:linear-gradient(180deg,#fff2c9,var(--gold) 50%,var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(255,150,60,.45));animation:glow 3.2s ease-in-out infinite}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 12px rgba(255,150,60,.3))}50%{filter:drop-shadow(0 0 26px rgba(255,150,60,.65))}}
+.sub{margin:0 0 22px;color:var(--muted);font-size:15px;line-height:1.8}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.chip{padding:7px 14px;border-radius:99px;font-size:13px;background:var(--glass);border:1px solid var(--glass-b);color:#dfe4f4;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+
+/* ---------- کارت موقت ---------- */
+.card{width:100%;padding:34px 22px;border-radius:26px;background:var(--glass);border:1px solid var(--glass-b);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,.35)}
+.num{font-size:64px;font-weight:900;line-height:1;margin-bottom:10px;
+  background:linear-gradient(180deg,var(--ember2),var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
+.card h2{margin:0 0 8px;font-size:22px}
+.card p{margin:0;color:var(--muted);line-height:1.9;font-size:15px}
+.soon{display:inline-block;margin-top:16px;padding:6px 14px;border-radius:99px;font-size:12px;color:var(--gold);
+  border:1px dashed rgba(246,196,83,.5)}
+
+/* ---------- مرحله ۲: اسم و رنگ ---------- */
+.tcard{width:100%;padding:14px;border-radius:20px;background:var(--glass);border:1px solid var(--glass-b);text-align:right;margin-bottom:12px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.thead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tag{font-weight:800;font-size:15px}
+.tcol{margin-inline-start:auto;font-size:12.5px;color:var(--muted)}
+.jersey{width:34px;height:34px;flex:none}
+.jersey path{fill:var(--jc,#3a4160);stroke:rgba(255,255,255,.45);stroke-width:2;stroke-linejoin:round;transition:fill .25s}
+.tin{width:100%;height:48px;border-radius:14px;border:1px solid var(--glass-b);background:rgba(0,0,0,.28);color:var(--text);
+  font:inherit;font-size:17px;padding:0 14px;outline:0;transition:border-color .2s,box-shadow .2s}
+.tin::placeholder{color:#6f7894}
+.tin:focus{border-color:var(--ember2);box-shadow:0 0 0 3px rgba(255,106,43,.22)}
+.tin.bad{border-color:#ff5a5a}
+.err{min-height:18px;margin:5px 4px 0;font-size:12.5px;color:#ff8a8a}
+.sws{display:flex;gap:14px;margin-top:6px}
+.sw{width:44px;height:44px;border-radius:50%;background:var(--c);border:2px solid rgba(255,255,255,.3);transition:transform .15s,box-shadow .2s,opacity .2s}
+.sw.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(246,196,83,.35),0 0 16px rgba(246,196,83,.5);transform:scale(1.1)}
+.sw:disabled{opacity:.2;pointer-events:none}
+.sw:active{transform:scale(.92)}
+
+/* ---------- مرحله ۲: ترکیب ---------- */
+.mini{margin:0 0 10px;color:var(--muted);font-size:13.5px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-bottom:12px}
+.segb{min-width:0;padding:10px 8px;border-radius:16px;background:var(--glass);border:1px solid var(--glass-b);
+  display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .2s}
+.segb.on{border-color:var(--ember2);background:rgba(255,106,43,.14);box-shadow:0 0 18px rgba(255,106,43,.25)}
+.segb b{max-width:100%;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.segb small{font-size:12px;color:var(--muted)}
+.segb .jersey{width:26px;height:26px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;width:100%}
+.fm{display:flex;align-items:center;gap:12px;padding:8px 12px;border-radius:16px;background:var(--glass);border:1px solid var(--glass-b);
+  transition:all .2s;text-align:right}
+.fm:active{transform:scale(.96)}
+.fm.sel{border-color:var(--gold);background:rgba(246,196,83,.12);box-shadow:0 0 16px rgba(246,196,83,.3)}
+.fm svg{width:44px;height:58px;flex:none;border-radius:8px}
+.fm b{font-size:18px}
+
+/* ---------- مرحله ۲: سکه ---------- */
+.vs{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;margin-bottom:4px;font-size:15px}
+.vs span{display:flex;align-items:center;gap:7px;min-width:0;max-width:42%;font-weight:800}
+.vs em{font-style:normal;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vs b{color:var(--muted);font-weight:500;font-size:13px}
+.dot{width:13px;height:13px;border-radius:50%;background:var(--c);border:1px solid rgba(255,255,255,.5);flex:none}
+.toss{position:relative;height:300px;width:100%;display:grid;place-items:center;perspective:700px;cursor:pointer}
+.toss::before{content:"";position:absolute;left:50%;top:50%;width:280px;height:280px;margin:-140px;border-radius:50%;
+  background:radial-gradient(circle,var(--wc,transparent),transparent 65%);opacity:0;transition:opacity .7s;pointer-events:none}
+.toss.won::before{opacity:.42}
+.cshadow{position:absolute;left:50%;top:calc(50% + 90px);width:130px;height:22px;margin-left:-65px;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(0,0,0,.65),transparent 70%);will-change:transform,opacity}
+.hop{position:relative;z-index:1;width:150px;height:150px;transform-style:preserve-3d;will-change:transform}
+.coin{position:relative;width:100%;height:100%;transform-style:preserve-3d;will-change:transform}
+.edge{position:absolute;inset:0;border-radius:50%;background:repeating-conic-gradient(#7d500c 0 4deg,#d9a23a 4deg 8deg)}
+.face{position:absolute;inset:0;border-radius:50%;display:grid;place-items:center;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;filter:brightness(var(--b,1));
+  background:repeating-conic-gradient(#f3c75a 0 3deg,#b07a18 3deg 6deg);box-shadow:0 0 0 1px #6b4509}
+.face.f{transform:translateZ(6px)}
+.face.b{transform:rotateX(180deg) translateZ(6px)}
+.face .in{position:absolute;inset:7px;border-radius:50%;
+  background:radial-gradient(circle at 35% 28%,#fff6cf,#f6c453 42%,#c8901f 78%,#9a6a12);
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.35),inset 0 0 0 9px var(--c),inset 0 0 0 11px rgba(0,0,0,.28),inset 0 -8px 16px rgba(0,0,0,.25)}
+.face .star{position:absolute;top:24px;left:0;right:0;text-align:center;color:#8a5a10;font-size:10px;letter-spacing:2px;font-style:normal}
+.face .lbl{position:relative;max-width:96px;color:#3a2504;font-weight:900;font-size:17px;line-height:1.3;text-align:center;word-break:break-word;
+  text-shadow:0 1px 0 rgba(255,255,255,.6),0 -1px 0 rgba(0,0,0,.22)}
+.face .shine{position:absolute;inset:7px;border-radius:50%;pointer-events:none;
+  background:linear-gradient(120deg,transparent 30%,rgba(255,255,255,.5) 44%,transparent 56%)}
+.spark{position:absolute;z-index:3;left:50%;top:50%;width:7px;height:7px;margin:-3.5px;border-radius:50%;pointer-events:none;
+  background:var(--sc);box-shadow:0 0 8px var(--sc),0 0 16px var(--sc);animation:spark .85s cubic-bezier(.1,.7,.3,1) both}
+@keyframes spark{from{transform:translate(0,0) scale(1);opacity:1}to{transform:translate(var(--dx),var(--dy)) scale(.15);opacity:0}}
+.ring{position:absolute;z-index:2;left:50%;top:50%;width:150px;height:150px;margin:-75px;border-radius:50%;pointer-events:none;
+  border:3px solid var(--sc);box-shadow:0 0 18px var(--sc);animation:ring .75s ease-out both}
+@keyframes ring{from{transform:scale(.85);opacity:.95}to{transform:scale(1.9);opacity:0}}
+.coinres{min-height:84px;width:100%}
+.coinres .big{font-size:20px;font-weight:900;color:var(--gold);margin-bottom:6px}
+.coinres p{margin:0;color:var(--muted);font-size:14.5px;line-height:1.8}
+.coinres p b{color:var(--text)}
+.pop{animation:pop .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pop{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+
+/* ---------- مرحله ۳: انتخاب بازیکن ---------- */
+.screen.dr{justify-content:flex-start;align-items:stretch;gap:8px;padding:6px 10px;overflow:hidden;text-align:right}
+.dtop{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.turn{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:16px;background:var(--glass);border:1px solid var(--glass-b)}
+.turn .jersey{width:30px;height:30px}
+.turn .t1{font-weight:800;font-size:14px;line-height:1.3}
+.turn small{color:var(--gold);font-size:12.5px;font-weight:700}
+.turn .cnt{margin-inline-start:auto;font-size:12px;color:var(--muted)}
+.undo{width:36px;height:36px;flex:none}
+.pitch{position:relative;flex:1;min-height:0;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.18);
+  background:repeating-linear-gradient(180deg,#10412a 0 12.5%,#0d3523 12.5% 25%);box-shadow:inset 0 0 30px rgba(0,0,0,.35)}
+.pl{position:absolute;inset:0;width:100%;height:100%}
+.pl *{vector-effect:non-scaling-stroke}
+.slot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:2px;width:70px;pointer-events:none}
+.slot .jersey{width:30px;height:30px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.5))}
+.slot .ph{width:30px;height:30px;border-radius:50%;border:2px dashed rgba(255,255,255,.4);display:grid;place-items:center;
+  font-size:9px;font-weight:800;color:rgba(255,255,255,.75);direction:ltr;background:rgba(0,0,0,.2)}
+.slot .nm{font-size:10px;font-weight:800;max-width:70px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;direction:ltr;
+  text-shadow:0 1px 3px #000,0 0 6px #000}
+.slot.cur .ph{border-color:var(--gold);color:var(--gold);animation:curp 1.2s ease-in-out infinite}
+.slot.prev .jersey{animation:curp 1.2s ease-in-out infinite}
+@keyframes curp{0%,100%{box-shadow:0 0 0 0 rgba(246,196,83,.7)}50%{box-shadow:0 0 0 8px rgba(246,196,83,0)}}
+.slot.bad .jersey{--jc:#d92d3a!important;outline:2px solid #ff3b4a;outline-offset:3px;border-radius:50%;box-shadow:0 0 12px 2px rgba(255,59,74,.75)}
+.slot.bad .nm{color:#ff8f8f}
+.slot.bad::after{content:"پست اشتباه";font-size:8.5px;font-weight:800;color:#fff;background:#d92d3a;border-radius:6px;padding:0 5px;margin-top:1px}
+.dtwo{display:flex;flex-direction:column;gap:8px;flex:1;min-height:0}
+.dhalf{flex:1;display:flex;flex-direction:column;min-height:0;gap:4px}
+.tcap{display:flex;align-items:center;gap:8px;font-size:13px}
+.tcap .jersey{width:22px;height:22px}
+.tcap small{color:var(--muted);margin-inline-start:auto;direction:ltr}
+.dfind{flex:none}
+.dfind .tin{height:42px;font-size:15px}
+.strip{flex:none;display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;padding:4px 2px 8px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.strip::-webkit-scrollbar{height:4px}
+.strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:9px}
+.pc{flex:none;width:106px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:16px;
+  background:var(--glass);border:1.5px solid var(--glass-b);transition:transform .18s,border-color .18s,background .18s,box-shadow .18s}
+.pc:active{transform:scale(.96)}
+.pc .jersey{width:38px;height:38px}
+.pc .en{font-size:13px;font-weight:800;line-height:1.2;direction:ltr;text-align:center;min-height:31px;display:flex;align-items:center;justify-content:center}
+.pc .fa{font-size:10.5px;color:var(--muted);line-height:1.25;text-align:center;min-height:26px;display:flex;align-items:center;justify-content:center}
+.pp{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;direction:ltr;min-height:21px}
+.pp i{font-style:normal;font-size:9.5px;font-weight:800;padding:2px 5px;border-radius:6px;color:var(--pc);border:1px solid var(--pc);background:rgba(0,0,0,.25)}
+.pp i.fit{background:var(--pc);color:#101420}
+.pp i.eq{border-style:dashed;background:rgba(52,211,153,.14)}
+.pp i.no{opacity:.55}
+.pc.bad{border-color:rgba(255,107,107,.35)}
+.pc.bad.sel{border-color:var(--gold)}
+.pc.sel{border-color:var(--gold);background:rgba(246,196,83,.15);box-shadow:0 0 18px rgba(246,196,83,.35);transform:translateY(-3px)}
+.pc.off{opacity:.3;pointer-events:none;filter:grayscale(.7)}
+/* --- چیدمان فشرده: زمین همیشه عمودی و با نسبت واقعی --- */
+.screen.dr{gap:6px;padding:4px 10px;overflow-y:auto}
+.turn{flex:none;padding:5px 6px 5px 8px;gap:8px;border-radius:14px}
+.turn .jersey{width:24px;height:24px;flex:none}
+.turn .tx{min-width:0;flex:0 1 auto;max-width:44%}
+.turn .t1{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.turn small{display:block;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.turn .cn{font-size:10.5px;font-weight:500;color:var(--muted)}
+.turn .tin{flex:1;min-width:0;height:34px;font-size:13.5px;padding:0 10px;border-radius:11px}
+.undo{width:32px;height:32px}
+.undo svg{width:18px;height:18px}
+.pwrap{flex:1;min-height:250px;display:flex;align-items:center;justify-content:center;container-type:size}
+.pitch{flex:none;width:min(100cqw,100cqh / 1.3);height:min(100cqh,100cqw * 1.3);container-type:size}
+.slot{width:22cqw;gap:1px}
+.slot .jersey,.slot .ph{width:clamp(22px,10.5cqw,34px);height:clamp(22px,10.5cqw,34px)}
+.slot .ph{font-size:clamp(7.5px,2.9cqw,10px)}
+.slot .nm{font-size:clamp(8px,3.4cqw,11px);max-width:22cqw}
+.slot.bad::after{font-size:clamp(7px,2.6cqw,9px)}
+.dtwo{flex-direction:row;gap:8px}
+.dhalf{min-width:0}
+.tcap{font-size:12px;gap:6px;min-width:0}
+.tcap b{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip{gap:7px;padding:2px 2px 5px}
+.pc{width:104px;gap:2px;padding:6px 5px 7px;border-radius:14px}
+.pc .jersey{width:26px;height:26px}
+.pc .en{font-size:12.5px;line-height:1.15;min-height:29px}
+.pc .fa{display:block;font-size:10px;min-height:0;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pp{min-height:19px}
+.pp i{font-size:9px;padding:1px 4px}
+body[data-step="draft"] #top{padding:6px 12px 2px}
+body[data-step="draft"] #top .icon{width:36px;height:36px}
+body[data-step="draft"] .dots{display:none}
+body[data-step="draft"] #foot{padding:6px 12px 10px}
+body[data-step="draft"] .cta{height:48px;font-size:16px;border-radius:15px}
+
+/* --- مربی، داور، زننده‌ها --- */
+.bust{width:30px;height:30px;flex:none}
+.turn .bust{width:26px;height:26px}
+.pc .bust{width:30px;height:30px}
+.tcap .jersey{width:20px;height:20px}
+.cbar .bust{width:20px;height:20px}
+.cbar{flex:none;display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;font-weight:700;direction:ltr}
+.jw{position:relative;display:block;line-height:0}
+.bd{position:absolute;top:-6px;right:-8px;min-width:15px;height:15px;padding:0 3px;border-radius:99px;display:grid;place-items:center;
+  background:var(--gold);color:#241500;font-size:9px;font-weight:900;line-height:1;box-shadow:0 0 0 2px rgba(10,30,20,.9)}
+.bd.sb{background:#7dd3fc}
+.bd+.bd{right:auto;left:-8px}
+.slot.tkp .jersey{outline:2px solid var(--gold);outline-offset:3px;border-radius:50%;animation:curp 1.2s ease-in-out infinite}
+.stagec{width:100%;height:100%;max-height:380px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  border-radius:20px;background:var(--glass);border:1px solid var(--glass-b);padding:12px;text-align:center}
+.stagec .bust{width:clamp(70px,34cqw,130px);height:auto;aspect-ratio:1;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.stagec .sh{font-size:17px;font-weight:900}
+.stagec small{color:var(--muted);font-size:12.5px}
+.stagec .sel{margin-top:8px;min-height:58px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.stagec .sel b{font-size:22px;font-weight:900;direction:ltr}
+.stagec .sel span{font-size:13px;color:var(--muted)}
+.stagec .sel.q{font-size:40px;color:rgba(255,255,255,.25);font-weight:900;justify-content:center}
+.dwrap{flex:1;min-height:0;display:flex;flex-direction:column;gap:6px;width:100%}
+.dwrap .dtwo{flex:1;min-height:0}
+.dhalf{flex:1}
+.refbar{flex:none;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 6px 4px 12px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:13px}
+.refbar b{direction:ltr;unicode-bidi:isolate}
+.cta{padding:0 12px;white-space:nowrap;text-overflow:ellipsis}
+
+.slot{width:var(--nw,22cqw)}
+.slot .nm{max-width:100%}
+.slot .nm.lg{font-size:clamp(7px,2.7cqw,8.6px);letter-spacing:-.15px}
+.slot .nm.xl{font-size:clamp(6.5px,2.3cqw,7.4px);letter-spacing:-.2px}
+.tabs{flex:none;display:flex;gap:8px}
+.tab{flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:6px;padding:6px 8px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-b);font-size:12.5px;transition:all .2s}
+.tab.on{border-color:var(--gold);background:rgba(246,196,83,.12)}
+.tab b{min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tab small{color:var(--muted);direction:ltr;font-size:11px}
+.tab .jersey{width:20px;height:20px;flex:none}
+[hidden]{display:none!important}
+.nores{padding:18px 8px;color:var(--muted);font-size:14px;width:100%;text-align:center}
+
+/* ---------- تنظیمات ---------- */
+.sheet{position:fixed;inset:0;z-index:10;display:flex;align-items:flex-end;justify-content:center}
+.sheet[hidden]{display:none}
+.backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;transition:opacity .22s}
+.panel{position:relative;width:100%;max-width:560px;padding:12px 22px calc(22px + env(safe-area-inset-bottom));
+  border-radius:26px 26px 0 0;background:linear-gradient(180deg,#171f3a,#0d1226);border:1px solid var(--glass-b);border-bottom:0;
+  transform:translateY(100%);transition:transform .25s cubic-bezier(.2,.8,.2,1)}
+.sheet.open .backdrop{opacity:1}
+.sheet.open .panel{transform:none}
+.grab{width:44px;height:5px;border-radius:99px;background:rgba(255,255,255,.2);margin:0 auto 14px}
+.panel h2{margin:0 0 14px;font-size:19px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:14px 4px;border-top:1px solid rgba(255,255,255,.08);font-size:16px}
+.switch{position:relative;width:54px;height:32px;border-radius:99px;background:rgba(255,255,255,.18);transition:background .25s}
+.switch i{position:absolute;top:3px;right:3px;width:26px;height:26px;border-radius:50%;background:#fff;transition:transform .25s;box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.switch[aria-checked="true"]{background:linear-gradient(135deg,var(--ember2),var(--ember))}
+.switch[aria-checked="true"] i{transform:translateX(-22px)}
+.ghost{width:100%;margin-top:10px;height:48px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:16px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;animation-iteration-count:1!important;transition-duration:.001s!important}
+}
+
+/* ================= مرحله‌ی بازی ================= */
+body[data-step="match"] #foot{display:none}
+body[data-step="match"] #dots{display:none}
+.screen.mt{justify-content:flex-start;align-items:stretch;gap:8px;padding:4px 10px 10px;overflow:hidden;text-align:right}
+.sb{position:relative;flex:none;border-radius:16px;overflow:hidden;
+  background:linear-gradient(180deg,rgba(24,31,58,.97),rgba(8,11,22,.97));border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 8px 24px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);transition:box-shadow .4s}
+.sb::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--c0) 50%,var(--c1) 50%)}
+.sb.flash{box-shadow:0 0 0 2px var(--gold),0 0 36px rgba(246,196,83,.65)}
+.sbl{display:flex;align-items:center;justify-content:space-between;padding:9px 12px 0;font-size:11px;color:var(--muted)}
+.live{display:flex;align-items:center;gap:5px;color:#ff6464;font-weight:800}
+.live i{width:7px;height:7px;border-radius:50%;background:#ff4040;box-shadow:0 0 8px #ff4040;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.clk{direction:ltr;unicode-bidi:isolate;font-family:system-ui,Arial,sans-serif;font-size:15px;color:var(--gold);font-weight:900;letter-spacing:.5px;text-shadow:0 0 12px rgba(246,196,83,.5)}
+.sbp{font-weight:700}
+.sbm{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px;padding:5px 10px 9px}
+.sbt{display:flex;align-items:center;gap:7px;min-width:0;font-weight:800;font-size:13.5px}
+.sbt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sbt.t1{justify-content:flex-end}
+.sbc{flex:none;display:inline-block;width:16px;height:20px;border-radius:5px 5px 7px 7px;background:var(--tc);border:1px solid rgba(255,255,255,.55);box-shadow:0 0 8px rgba(0,0,0,.4)}
+.sbs,.bks{display:flex;align-items:center;gap:5px}
+.sbs b,.bks b{min-width:34px;height:44px;padding:0 4px;border-radius:10px;background:#04060c;border:1px solid rgba(255,255,255,.2);
+  display:grid;place-items:center;font-size:26px;font-weight:900;color:#fff;font-family:system-ui,Arial,sans-serif;box-shadow:inset 0 0 10px rgba(255,255,255,.07)}
+.sbs em,.bks em{font-style:normal;color:var(--gold);font-weight:900;font-size:20px}
+.sbs b.pop{animation:spop .9s ease}
+@keyframes spop{0%{transform:scale(1)}25%{transform:scale(1.5);color:var(--gold);box-shadow:0 0 22px var(--gold)}100%{transform:scale(1)}}
+.sbpk{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:0 14px 8px;font-size:12px;font-weight:800;color:var(--gold)}
+.sbpk b{font-size:18px;color:#fff;font-family:system-ui,Arial,sans-serif}.sbpk b:first-child{justify-self:start}.sbpk b:last-child{justify-self:end}
+.fpk{display:grid;grid-template-columns:auto auto auto;gap:10px;align-items:center;font-size:13px;color:var(--gold);font-weight:800}
+.fpk b{font-size:20px;color:#fff;font-family:system-ui,Arial,sans-serif}
+.rpb.sc{-webkit-mask-image:linear-gradient(180deg,#000 calc(100% - 34px),transparent);mask-image:linear-gradient(180deg,#000 calc(100% - 34px),transparent)}
+.sbpk[hidden]{display:none}
+.mv{position:relative;flex:1;min-height:0}
+.v{position:absolute;inset:0;display:flex;flex-direction:column;gap:8px;animation:vin .38s ease both;min-height:0}
+@keyframes vin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+/* شمارش */
+.v.cnt{align-items:center;justify-content:center;text-align:center;gap:14px}
+.cn-vs{display:flex;align-items:center;justify-content:center;gap:14px;width:100%}
+.cn-t{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;min-width:0}
+.cn-t b{font-size:15px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cn-t small{color:var(--muted);font-size:12px}
+.cn-j{width:62px;height:62px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.5))}
+.cn-j .jersey{width:100%;height:100%}
+.cn-x{font-weight:900;font-size:20px;color:var(--gold)}
+.cnum{height:110px;display:grid;place-items:center;font-size:92px;font-weight:900;color:var(--gold);text-shadow:0 0 34px rgba(246,196,83,.75)}
+.cnum.pop{animation:cpop .9s ease both}
+.cnum.go{font-size:56px;color:var(--ember2);text-shadow:0 0 34px rgba(255,106,43,.9)}
+@keyframes cpop{0%{transform:scale(2.2);opacity:0}25%{transform:scale(1);opacity:1}80%{opacity:1}100%{transform:scale(.85);opacity:.2}}
+.cn-r{color:var(--muted);font-size:12.5px}
+/* توپ چرخان */
+.v.bv{align-items:center;justify-content:center;text-align:center;gap:12px}
+.bring{position:relative;width:176px;height:176px;display:grid;place-items:center}
+.bring::before{content:"";position:absolute;inset:6px;border-radius:50%;filter:blur(16px);opacity:.6;
+  background:conic-gradient(var(--c0,#ff6a2b),transparent 28%,var(--c1,#5aa7ff) 50%,transparent 78%,var(--c0,#ff6a2b));animation:bspin 3.4s linear infinite}
+.bring svg{position:relative;width:112px;height:112px;animation:bspin 1.25s linear infinite;filter:drop-shadow(0 10px 14px rgba(0,0,0,.55))}
+@keyframes bspin{to{transform:rotate(360deg)}}
+.bsh{width:90px;height:10px;border-radius:50%;background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent);animation:bsh 1.25s ease-in-out infinite}
+@keyframes bsh{50%{transform:scaleX(.7);opacity:.6}}
+.btx{color:var(--muted);font-size:14px;min-height:22px;transition:opacity .22s}
+/* گزارش */
+.v.rp{gap:8px}
+.rph{flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+.rpm{display:flex;align-items:baseline;gap:6px;font-size:30px;font-weight:900;color:var(--gold);text-shadow:0 0 16px rgba(246,196,83,.4)}
+.rpm small{font-size:13px;color:var(--muted);font-weight:700}
+.rpt{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:800;padding:5px 10px;border-radius:99px;background:var(--glass);border:1px solid var(--glass-b)}
+.rpb{flex:1;min-height:0;overflow-y:auto;padding:12px 14px 4px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid var(--glass-b);
+  font-size:14.5px;line-height:2;color:#efeadd;overscroll-behavior:contain}
+.rpb p{margin:0 0 12px}
+.rpb p span,.pkt span{display:block;animation:rise .5s ease both}
+.rpb p:last-child{color:#ffd9a0}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.cta.rd,.v .cta{flex:none;height:50px;font-size:17px}
+/* اعلام گل */
+.gbn{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;
+  background:radial-gradient(70% 55% at 50% 50%,rgba(0,0,0,.2),rgba(4,6,12,.9));animation:gin 3.1s ease both;border-radius:18px}
+.gbn b{font-size:48px;font-weight:900;color:var(--gold);text-shadow:0 0 36px rgba(246,196,83,.9),0 0 8px #000;animation:gz .7s ease both}
+.gbn strong{font-size:24px;color:#fff;text-shadow:0 0 18px var(--tc)}
+.gbn span{font-size:14px;color:var(--ember2)}
+.gbn.no b{font-size:34px;color:#cfd6ea;text-shadow:0 0 20px rgba(150,170,220,.6)}
+@keyframes gin{0%{opacity:0}12%{opacity:1}85%{opacity:1}100%{opacity:0}}
+@keyframes gz{0%{transform:scale(.3) rotate(-6deg)}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+/* استراحت */
+.v.brk{gap:8px}
+.bk{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:6px 4px;text-align:center}
+.bk h2{margin:0;font-size:21px;color:var(--gold)}
+.bk p{margin:0;color:var(--muted);font-size:13.5px}
+.gls{display:flex;gap:10px;width:100%;justify-content:space-between;align-items:flex-start}
+.glc{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px;font-size:12.5px;text-align:right;padding:8px 10px;border-radius:12px;background:var(--glass);border:1px solid var(--glass-b)}
+.glc b{display:flex;align-items:center;gap:6px;font-size:13px;margin-bottom:2px}
+.glc span.mu{color:var(--muted)}
+.gl0{width:100%;color:var(--muted);font-size:13px;padding:8px}
+.sts{width:100%;display:flex;flex-direction:column;gap:9px}
+.st{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;row-gap:3px;font-size:12.5px}
+.st b{font-size:14px}.st b:last-of-type{text-align:left}
+.st span{text-align:center;color:var(--muted)}
+.stb{grid-column:1/-1;display:flex;height:5px;border-radius:9px;overflow:hidden;background:rgba(255,255,255,.08);gap:2px}
+.stb i{display:block;height:100%}
+/* پنالتی */
+.v.pki{align-items:center;justify-content:center;text-align:center}
+.pk0{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:0 8px}
+.pk0t{font-size:26px;font-weight:900;color:var(--gold)}
+.pk0 p{margin:0;line-height:2;font-size:14.5px;color:#efeadd}
+.v.pkv{gap:8px}
+.pktr{flex:none;display:flex;flex-direction:column;gap:6px;padding:8px 10px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b)}
+.pkr{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.pkn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:40%}
+.pkd{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.pkd i{width:20px;height:20px;border-radius:50%;border:2px solid rgba(255,255,255,.25);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:900}
+.pkd i.g{background:#2fbf71;border-color:#2fbf71;color:#04170c}
+.pkd i.x{background:#e5484d;border-color:#e5484d;color:#fff}
+.pkd i.cur{border-color:var(--gold);box-shadow:0 0 10px var(--gold);animation:blink 1s infinite}
+.pkc{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:10px 14px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.03));border:1px solid var(--glass-b);overflow:hidden}
+.pkl{font-size:12.5px;color:var(--muted)}
+.pkp{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:900}
+.pkp .jersey{width:42px;height:42px}
+.pkk{font-size:13px;color:var(--muted)}
+.pkcr{font-size:13px;font-weight:800;color:var(--ember2);animation:blink 1.1s infinite}
+.pkball{width:56px;height:56px;margin-top:6px;transition:transform .9s cubic-bezier(.2,.7,.3,1),opacity .9s}
+.pkball svg{width:100%;height:100%}
+.pkball.fly{transform:translateY(-60px) scale(.35) rotate(540deg);opacity:.2}
+.pkc.res .pkbadge{font-size:26px;font-weight:900;padding:4px 20px;border-radius:99px;animation:gz .6s ease both}
+.pkc.res.goal .pkbadge{background:#2fbf71;color:#04170c;box-shadow:0 0 24px #2fbf71}
+.pkc.res.save .pkbadge,.pkc.res.miss .pkbadge,.pkc.res.post .pkbadge{background:#e5484d;color:#fff;box-shadow:0 0 24px #e5484d}
+.pkt{margin:0;line-height:1.95;font-size:14px;color:#efeadd;animation:rise .5s ease both}
+/* پایان */
+.v.fin{overflow:hidden}
+.fsc{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;align-items:center;gap:10px;padding:4px 2px 10px;text-align:center;position:relative;z-index:1}
+.fcup{font-size:46px;animation:gz .8s ease both;filter:drop-shadow(0 0 18px rgba(246,196,83,.8))}
+.fttl{font-size:13px;color:var(--muted);letter-spacing:.5px}
+.fwin{display:flex;align-items:center;gap:8px;font-size:20px;font-weight:900;color:#fff;text-shadow:0 0 22px var(--tc)}
+.fpk{font-size:13px;color:var(--gold);font-weight:800}
+.mom{width:100%;display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;text-align:right;background:linear-gradient(135deg,rgba(246,196,83,.18),rgba(255,106,43,.1));border:1px solid rgba(246,196,83,.4)}
+.momj{width:44px;height:44px;flex:none}.momj .jersey{width:100%;height:100%}
+.mom small{display:block;color:var(--gold);font-size:11.5px}
+.mom b{display:block;font-size:17px}
+.mom span{font-size:12.5px;color:var(--muted)}
+.fbt{width:100%;display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.fbt .ghost{height:44px;border-radius:14px;background:var(--glass);border:1px solid var(--glass-b);font-size:14px;font-weight:700}
+.conf{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:2}
+.conf i{position:absolute;top:-12px;width:7px;height:12px;border-radius:2px;opacity:.9;animation:cf var(--t) linear var(--d) infinite}
+@keyframes cf{to{transform:translateY(560px) rotate(720deg);opacity:.2}}
+@media (max-height:600px){
+  .cnum{height:90px;font-size:76px}
+  .bring{width:150px;height:150px}.bring svg{width:96px;height:96px}
+  .rpb{font-size:14px;line-height:1.9}
+}
+@media (prefers-reduced-motion:reduce){
+  .bring svg,.bring::before,.bsh,.live i,.pkcr,.conf i{animation:none}
+}
+</style>
+</head>
+<body>
+<div id="bg"><div class="beam l"></div><div class="beam r"></div></div>
+<canvas id="embers" aria-hidden="true"></canvas>
+
+<div id="app">
+  <header id="top">
+    <div class="navg">
+      <button id="btnBack" class="icon" aria-label="مرحله‌ی قبل"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+      <button id="btnFwd" class="icon" aria-label="مرحله‌ی بعد"><svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg></button>
+    </div>
+    <div id="stepLabel"><b></b><small></small></div>
+    <button id="btnSettings" class="icon" aria-label="تنظیمات"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+  </header>
+  <div id="dots" class="dots"></div>
+  <main id="stage"></main>
+  <footer id="foot"><button id="btnNext" class="cta">بعدی</button></footer>
+</div>
+
+<div id="sheet" class="sheet" hidden>
+  <div class="backdrop" data-close></div>
+  <div class="panel" role="dialog" aria-label="تنظیمات">
+    <div class="grab"></div>
+    <h2>تنظیمات</h2>
+    <div class="row"><span>🎵 آهنگ</span>
+      <button id="swMusic" class="switch" role="switch" aria-checked="true" aria-label="آهنگ"><i></i></button></div>
+    <div class="row"><span>🏟 صدای ورزشگاه و سوت</span>
+      <button id="swArena" class="switch" role="switch" aria-checked="true" aria-label="صدای ورزشگاه"><i></i></button></div>
+    <button class="ghost" data-close>بستن</button>
+  </div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+const FA='۰۱۲۳۴۵۶۷۸۹';
+const fa=n=>String(n).replace(/\d/g,d=>FA[+d]);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ================= آهنگ (ساخته‌شده با Web Audio، بدون فایل و بدون کپی‌رایت) ================= */
+const Music=(()=>{
+  const KEY='dd_music';
+  let ctx=null,master=null,noise=null,timer=null,step=0,nextT=0,started=false,enabled=true,held=false;
+  try{enabled=localStorage.getItem(KEY)!=='0'}catch(e){}
+  const BPM=112,EIGHTH=60/BPM/2,LOOP=64,VOL=.5;
+  const hz=m=>440*Math.pow(2,(m-69)/12);
+  // آکورد هر میزان: [باس, [پد]]  (Am F C G Am F G E)
+  const CH=[[45,[57,60,64]],[41,[53,57,60]],[48,[55,60,64]],[43,[55,59,62]],[45,[57,60,64]],[41,[53,57,60]],[43,[55,59,62]],[40,[56,59,64]]];
+  const MEL=[
+    [76,0,76,74,72,0,74,76],
+    [77,0,77,76,74,0,72,0],
+    [72,0,76,79,0,76,74,72],
+    [74,0,74,76,74,0,71,0],
+    [76,0,76,74,72,0,74,76],
+    [77,0,81,77,76,0,74,72],
+    [79,0,79,76,74,0,71,74],
+    [71,0,76,0,75,76,0,0]
+  ];
+  const BASSP=[1,0,1,1,1,0,1,2];
+  function mk(){
+    const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return false;
+    ctx=new AC(); master=ctx.createGain(); master.gain.value=0;
+    const comp=ctx.createDynamicsCompressor(); master.connect(comp); comp.connect(ctx.destination);
+    noise=ctx.createBuffer(1,ctx.sampleRate,ctx.sampleRate);
+    const d=noise.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    try{ const b=ctx.createBuffer(1,1,22050), s=ctx.createBufferSource(); s.buffer=b; s.connect(ctx.destination); s.start(0); }catch(e){}
+    return true;
+  }
+  function env(g,t,a,peak,dur){
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(peak,t+a);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  }
+  function kick(t){
+    const o=ctx.createOscillator(),g=ctx.createGain(); o.type='sine';
+    o.frequency.setValueAtTime(155,t); o.frequency.exponentialRampToValueAtTime(42,t+.14);
+    env(g,t,.004,.95,.28); o.connect(g); g.connect(master); o.start(t); o.stop(t+.32);
+  }
+  function hit(t,type,freq,peak,dur,q){
+    const s=ctx.createBufferSource(); s.buffer=noise;
+    const f=ctx.createBiquadFilter(); f.type=type; f.frequency.value=freq; if(q) f.Q.value=q;
+    const g=ctx.createGain(); env(g,t,.002,peak,dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t,Math.random()*.5); s.stop(t+dur+.03);
+  }
+  function clap(t){ hit(t,'bandpass',1500,.5,.05,1.2); hit(t+.011,'bandpass',1700,.45,.05,1.2); hit(t+.024,'bandpass',1500,.6,.22,1.0); }
+  function swell(t,dur){
+    const s=ctx.createBufferSource(); s.buffer=noise; s.loop=true;
+    const f=ctx.createBiquadFilter(); f.type='bandpass'; f.Q.value=.8;
+    f.frequency.setValueAtTime(700,t); f.frequency.exponentialRampToValueAtTime(2400,t+dur);
+    const g=ctx.createGain(); g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(.09,t+dur*.8); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t+dur+.05);
+  }
+  function osc(t,m,type,peak,dur,cut,att,det){
+    const o=ctx.createOscillator(); o.type=type; o.frequency.value=hz(m); if(det) o.detune.value=det;
+    const f=ctx.createBiquadFilter(); f.type='lowpass'; f.frequency.value=cut;
+    const g=ctx.createGain(); env(g,t,att,peak,dur);
+    o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t+dur+.05);
+  }
+  function play(i,t){
+    const bar=(i/8)|0, s=i%8, ch=CH[bar];
+    if(s===0) ch[1].forEach(m=>osc(t,m,'triangle',.05,EIGHTH*8,1500,.25));
+    const bp=BASSP[s];
+    if(bp===1) osc(t,ch[0],'sawtooth',.26,EIGHTH*.92,420,.01);
+    if(bp===2) osc(t,ch[0]+7,'sawtooth',.24,EIGHTH*.92,420,.01);
+    if(s%2===0) kick(t);
+    if(s===2||s===6||(bar===7&&s===7)) clap(t);
+    if(s%2) hit(t,'highpass',7000,.13,.09); else hit(t,'highpass',8000,.07,.04);
+    if(i%32===0) swell(t,EIGHTH*14);
+    const m=MEL[bar][s];
+    if(m){
+      const nxt=MEL[bar][(s+1)%8], d=nxt?EIGHTH*.95:EIGHTH*1.9;
+      osc(t,m,'sawtooth',.05,d,3400,.012,-7); osc(t,m,'sawtooth',.05,d,3400,.012,7); osc(t,m+12,'square',.012,d,2600,.012,0);
+    }
+  }
+  function pump(){
+    while(nextT<ctx.currentTime+.15){ play(step,nextT); nextT+=EIGHTH; step=(step+1)%LOOP; }
+  }
+  function fade(v){
+    if(!master) return; const t=ctx.currentTime;
+    master.gain.cancelScheduledValues(t); master.gain.setTargetAtTime(v,t,.3);
+  }
+  function begin(){
+    if(started||!enabled||held||!ctx||ctx.state!=='running') return;
+    started=true; nextT=ctx.currentTime+.08; step=0;
+    timer=setInterval(pump,40); fade(VOL);
+  }
+  function start(){
+    if(!enabled||held) return;
+    if(!ctx&&!mk()) return;
+    if(ctx.state!=='running'){ try{ ctx.resume().then(begin).catch(()=>{}); }catch(e){} }
+    else begin();
+  }
+  function halt(){
+    clearInterval(timer); timer=null; started=false; try{ctx.suspend()}catch(e){}
+  }
+  function set(on){
+    enabled=on; try{localStorage.setItem(KEY,on?'1':'0')}catch(e){}
+    if(on) start();
+    else if(started){ fade(0); setTimeout(()=>{ if(!enabled) halt(); },900); }
+  }
+  // قبل از شروع گزارش بازی آروم قطع می‌شه و با برگشتن به مراحل قبل دوباره پخش می‌شه
+  function hold(h){
+    held=h;
+    if(h){ if(started){ fade(0); setTimeout(()=>{ if(held) halt(); },1000); } }
+    else start();
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(!ctx||!started) return;
+    try{ document.hidden ? ctx.suspend() : (enabled&&!held&&ctx.resume()); }catch(e){}
+  });
+  return {start,set,hold,on:()=>enabled,playing:()=>started&&!!ctx&&ctx.state==='running'};
+})();
+
+/* ================= افکت‌های صوتی (سکه) ================= */
+const SFX=(()=>{
+  let c=null,nb=null;
+  function get(){
+    if(!c){
+      const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+      c=new AC(); nb=c.createBuffer(1,c.sampleRate,c.sampleRate);
+      const d=nb.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1;
+    }
+    if(c.state==='suspended') c.resume();
+    return c;
+  }
+  function env(g,t,v,a,dur){
+    g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(Math.max(v,0.0002),t+a);
+    g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  }
+  // صدای فلزی: چند هارمونیک ناهمسان مثل سکه‌ی واقعی
+  function metal(f,v,dur,dl=0){
+    const a=get(); if(!a) return; const t=a.currentTime+dl;
+    [[1,1],[2.76,.6],[5.4,.35],[8.93,.2]].forEach(([r,m],i)=>{
+      const o=a.createOscillator(),g=a.createGain(); o.type='sine'; o.frequency.value=f*r;
+      env(g,t,v*m,.003,dur/(1+i*.7)); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+.05);
+    });
+  }
+  function hiss(type,f1,f2,q,v,dur,dl=0){
+    const a=get(); if(!a) return; const t=a.currentTime+dl;
+    const s=a.createBufferSource(); s.buffer=nb;
+    const f=a.createBiquadFilter(); f.type=type; f.Q.value=q;
+    f.frequency.setValueAtTime(f1,t); f.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    const g=a.createGain(); g.gain.setValueAtTime(0.0001,t);
+    g.gain.exponentialRampToValueAtTime(v,t+dur*.35); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+    s.connect(f); f.connect(g); g.connect(a.destination); s.start(t,Math.random()*.4); s.stop(t+dur+.05);
+  }
+  function note(f,v,dur,dl){
+    const a=get(); if(!a) return; const t=a.currentTime+dl;
+    const o=a.createOscillator(),g=a.createGain(); o.type='triangle'; o.frequency.value=f;
+    env(g,t,v,.01,dur); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+dur+.05);
+  }
+  return {
+    flick(){ metal(2600,.32,.6); hiss('highpass',4000,6000,.7,.2,.05); },
+    whoosh(d){ hiss('bandpass',450,1700,1.3,.13,d*.55); hiss('bandpass',1700,450,1.3,.1,d*.45,d*.55); },
+    tick(v){ metal(3400,v,.08); },
+    land(v){ metal(1750,.42*v,.25+.5*v); hiss('bandpass',3200,2600,2,.35*v,.07); },
+    rattle(v){ metal(2000+Math.random()*350,.22*v,.07); },
+    chime(){ [1046.5,1318.5,1568,2093].forEach((f,i)=>note(f,.11,.9,i*.08)); }
+  };
+})();
+
+/* ================= جرقه‌های فسفری ================= */
+(()=>{
+  const cv=$('#embers'), c=cv.getContext('2d');
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let W=0,H=0,dpr=1,ps=[],last=0,raf=0,tmr=0;
+  function sprite(r,g,b){
+    const s=document.createElement('canvas'); s.width=s.height=64; const x=s.getContext('2d');
+    const gr=x.createRadialGradient(32,32,0,32,32,32);
+    gr.addColorStop(0,'rgba(255,255,255,.95)');
+    gr.addColorStop(.18,`rgba(${r},${g},${b},.9)`);
+    gr.addColorStop(.5,`rgba(${r},${g},${b},.25)`);
+    gr.addColorStop(1,`rgba(${r},${g},${b},0)`);
+    x.fillStyle=gr; x.fillRect(0,0,64,64); return s;
+  }
+  const SP=[sprite(255,106,43),sprite(255,179,71),sprite(255,70,30)];
+  function mkp(init){
+    return {x:Math.random()*W, y:init?Math.random()*H:H+20*dpr,
+      s:(8+Math.random()*18)*dpr, vy:(18+Math.random()*46)*dpr,
+      sw:Math.random()*6.28, sa:(8+Math.random()*22)*dpr, sf:.4+Math.random()*1.2,
+      a:.55+Math.random()*.45, k:(Math.random()*3)|0};
+  }
+  function size(){
+    dpr=Math.min(window.devicePixelRatio||1,1.5);
+    W=cv.width=Math.round(innerWidth*dpr); H=cv.height=Math.round(innerHeight*dpr);
+    const n=reduce?10:(innerWidth<600?34:56);
+    ps=Array.from({length:n},()=>mkp(true));
+  }
+  function frame(t){
+    const dt=Math.min(.05,(t-last)/1000||.016); last=t;
+    c.clearRect(0,0,W,H); c.globalCompositeOperation='lighter';
+    for(const p of ps){
+      p.y-=p.vy*dt; p.sw+=p.sf*dt;
+      const fade=Math.max(0,Math.min(1,(p.y/H)*1.6));
+      c.globalAlpha=p.a*fade*(.75+.25*Math.sin(p.sw*3));
+      c.drawImage(SP[p.k],p.x+Math.sin(p.sw)*p.sa-p.s/2,p.y-p.s/2,p.s,p.s);
+      if(p.y<-20*dpr) Object.assign(p,mkp(false));
+    }
+    c.globalAlpha=1; raf=requestAnimationFrame(frame);
+  }
+  function run(){ cancelAnimationFrame(raf); last=performance.now(); raf=requestAnimationFrame(frame); }
+  addEventListener('resize',()=>{ clearTimeout(tmr); tmr=setTimeout(size,150); });
+  document.addEventListener('visibilitychange',()=>{ document.hidden?cancelAnimationFrame(raf):run(); });
+  size(); run();
+})();
+
+/* ================= داده‌ی بازی ================= */
+const COLORS=[
+  {id:'blue', name:'آبی',  hex:'#2f6bff'},
+  {id:'black',name:'مشکی', hex:'#171a22'},
+  {id:'white',name:'سفید', hex:'#f2f4fa'},
+  {id:'red',  name:'قرمز', hex:'#e63946'}
+];
+const FORMS=['4-4-2','4-3-3','4-2-3-1','4-5-1','3-5-2','3-4-3','5-3-2','4-1-4-1','4-4-1-1','5-4-1'];
+const G={ teams:[{name:'',color:null,form:null},{name:'',color:null,form:null}], coin:null };
+const ui={busy:false,ft:0,coinAngle:0};
+
+const norm=s=>s.replace(/[‌‍\s]+/g,'').replace(/ي/g,'ی').replace(/ك/g,'ک').toLowerCase();
+const tname=t=>G.teams[t].name.trim()||('تیم '+fa(t+1));
+const colorHex=t=>{const c=COLORS.find(x=>x.id===G.teams[t].color);return c?c.hex:null;};
+const colorName=t=>{const c=COLORS.find(x=>x.id===G.teams[t].color);return c?c.name:null;};
+const JERSEY=t=>`<svg class="jersey" viewBox="0 0 64 64" style="--jc:${colorHex(t)||'#3a4160'}" aria-hidden="true"><path d="M20 6L8 14L3 28L14 32L16 26V58H48V26L50 32L61 28L56 14L44 6C40 11 24 11 20 6Z"/></svg>`;
+function namesDup(){
+  const a=norm(G.teams[0].name), b=norm(G.teams[1].name);
+  return !!(a&&b&&a===b);
+}
+function teamsOk(){
+  return G.teams.every(t=>t.name.trim().length>0 && t.color) && !namesDup();
+}
+function formsOk(){ return G.teams.every(t=>t.form); }
+
+/* ================= توپ (پنج‌ضلعی‌های واقعی با درز) ================= */
+function ballSVG(){
+  const cx=60,cy=60,r=15.5,d=46, rad=a=>a*Math.PI/180;
+  const pt=(x,y,rr,a)=>[x+rr*Math.cos(rad(a)),y+rr*Math.sin(rad(a))];
+  const poly=(x,y,rr,a0)=>Array.from({length:5},(_,j)=>pt(x,y,rr,a0+72*j));
+  const P=a=>a.map(p=>p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  const F=p=>p[0].toFixed(1)+' '+p[1].toFixed(1);
+  let patches=`<polygon points="${P(poly(cx,cy,r,-90))}"/>`, seams='';
+  for(let k=0;k<5;k++){
+    const a=-90+72*k, [ox,oy]=pt(cx,cy,d,a), outer=poly(ox,oy,r,a+180);
+    patches+=`<polygon points="${P(outer)}"/>`;
+    seams+=`M${F(pt(cx,cy,r,a))}L${F(outer[0])}`;
+    const a2=a+72, [ox2,oy2]=pt(cx,cy,d,a2), outer2=poly(ox2,oy2,r,a2+180);
+    seams+=`M${F(outer[4])}L${F(outer2[1])}`;
+  }
+  return `<svg class="ball" viewBox="0 0 120 120" aria-hidden="true">
+  <defs>
+    <radialGradient id="bb" cx="38%" cy="32%" r="78%"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d4dae9"/></radialGradient>
+    <radialGradient id="bs" cx="38%" cy="32%" r="80%"><stop offset=".5" stop-color="#0a0e28" stop-opacity="0"/><stop offset="1" stop-color="#0a0e28" stop-opacity=".42"/></radialGradient>
+    <clipPath id="bc"><circle cx="60" cy="60" r="54"/></clipPath>
+  </defs>
+  <circle cx="60" cy="60" r="54" fill="url(#bb)"/>
+  <g clip-path="url(#bc)">
+    <g fill="#14192e" stroke="#14192e" stroke-width="1.6" stroke-linejoin="round">${patches}</g>
+    <path d="${seams}" stroke="#14192e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+  </g>
+  <circle cx="60" cy="60" r="54" fill="url(#bs)"/>
+  <circle cx="60" cy="60" r="54" fill="none" stroke="#0b1020" stroke-width="2"/>
+  <ellipse cx="42" cy="32" rx="14" ry="7" fill="#fff" opacity=".35" transform="rotate(-32 42 32)"/>
+</svg>`;
+}
+
+function miniPitch(f,color){
+  const L=f.split('-').map(Number), n=L.length; let d='';
+  L.forEach((m,i)=>{
+    const y=n===1?35:58-i*(46/(n-1));
+    for(let j=0;j<m;j++){ const x=60*(j+1)/(m+1); d+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.6"/>`; }
+  });
+  return `<svg viewBox="0 0 60 80" aria-hidden="true"><rect width="60" height="80" rx="6" fill="#0e2a1d"/>
+  <rect x="3" y="3" width="54" height="74" rx="3" fill="none" stroke="rgba(255,255,255,.28)"/>
+  <line x1="3" y1="40" x2="57" y2="40" stroke="rgba(255,255,255,.22)"/><circle cx="30" cy="40" r="7" fill="none" stroke="rgba(255,255,255,.22)"/>
+  <g fill="${color}" stroke="rgba(255,255,255,.8)" stroke-width="1"><circle cx="30" cy="72" r="3.6"/>${d}</g></svg>`;
+}
+
+/* ================= مراحل ================= */
+const STEPS=[
+  {id:'welcome',  label:'شروع',          cta:'شروع بازی'},
+  {id:'teams',    label:'اسم و رنگ تیم‌ها', ok:teamsOk, cta:()=>teamsOk()?'بعدی':'اسم و رنگ هر دو تیم رو کامل کن'},
+  {id:'formation',label:'ترکیب',         ok:formsOk, cta:()=>formsOk()?'بعدی':'ترکیب هر دو تیم رو انتخاب کن',},
+  {id:'coin',     label:'پرتاب سکه',     ok:()=>true, cta:()=>G.coin?'بعدی':'پرتاب سکه', action:()=>{ if(!G.coin){ toss(); return true; } return false; }},
+  {id:'draft',    label:'انتخاب بازیکن', hint:'بازیکن‌ها، مربی، داور و زننده‌ها رو اینجا انتخاب می‌کنید'},
+  {id:'match',    label:'بازی',          hint:'سوت شروع، گزارش زنده و نتیجه‌ی بازی اینجا اتفاق می‌افته'}
+];
+const state={step:0,max:0};
+const stage=$('#stage'), dots=$('#dots'), lab=$('#stepLabel');
+const btnBack=$('#btnBack'), btnFwd=$('#btnFwd'), btnNext=$('#btnNext');
+STEPS.forEach(()=>dots.appendChild(document.createElement('i')));
+
+const SCREENS={};
+
+SCREENS.welcome=el=>{
+  el.innerHTML=`
+    <div class="hero">${ballSVG()}</div>
+    <h1 class="title">دربی رویایی</h1>
+    <p class="sub">تیم رویایی‌ت رو از بین افسانه‌های فوتبال بچین<br>و گزارش زنده‌ی بازی رو ببین</p>
+    <div class="chips"><span class="chip">۲ تا ۴ نفره</span><span class="chip">افسانه‌های فوتبال</span><span class="chip">گزارش زنده</span></div>`;
+};
+
+/* ---- اسم و رنگ ---- */
+SCREENS.teams=el=>{
+  el.classList.add('top');
+  el.innerHTML=[0,1].map(t=>`
+    <div class="tcard">
+      <div class="thead">${JERSEY(t)}<span class="tag">بازیکن ${fa(t+1)}</span><span class="tcol" data-colname="${t}"></span></div>
+      <input class="tin" data-t="${t}" maxlength="16" dir="auto" autocomplete="off" autocapitalize="off" spellcheck="false"
+        placeholder="${t?'اسم تیمت رو بنویس (غیر از تیم اول)':'اسم تیمت رو بنویس (مثلاً بارسلونا)'}" value="${esc(G.teams[t].name)}">
+      <div class="err" data-err="${t}"></div>
+      <div class="sws" role="group" aria-label="رنگ لباس">${COLORS.map(c=>`<button class="sw" data-t="${t}" data-c="${c.id}" style="--c:${c.hex}" aria-label="${c.name}"></button>`).join('')}</div>
+    </div>`).join('');
+  const upd=()=>{
+    const dup=namesDup();
+    el.querySelectorAll('.tin')[1].classList.toggle('bad',dup);
+    el.querySelector('[data-err="1"]').textContent=dup?'این اسم قبلاً انتخاب شده، یه اسم دیگه بنویس':'';
+    [0,1].forEach(t=>{
+      el.querySelectorAll('.jersey')[t].style.setProperty('--jc',colorHex(t)||'#3a4160');
+      el.querySelector(`[data-colname="${t}"]`).textContent=colorName(t)?`لباس ${colorName(t)}`:'رنگ لباس رو انتخاب کن';
+    });
+    el.querySelectorAll('.sw').forEach(s=>{
+      const t=+s.dataset.t, c=s.dataset.c;
+      s.classList.toggle('sel',G.teams[t].color===c);
+      s.disabled=G.teams[1-t].color===c;
+    });
+    chrome();
+  };
+  el.addEventListener('input',e=>{
+    const i=e.target.closest('.tin'); if(!i) return;
+    G.teams[+i.dataset.t].name=i.value; G.coin=null; upd();
+  });
+  el.addEventListener('click',e=>{
+    const b=e.target.closest('.sw'); if(!b||b.disabled) return;
+    G.teams[+b.dataset.t].color=b.dataset.c; G.coin=null; upd();
+  });
+  el.addEventListener('keydown',e=>{
+    if(e.key!=='Enter'||!e.target.matches('.tin')) return;
+    e.preventDefault();
+    const ins=el.querySelectorAll('.tin');
+    if(e.target===ins[0]) ins[1].focus(); else e.target.blur();
+  });
+  upd();
+};
+
+/* ---- ترکیب ---- */
+SCREENS.formation=el=>{
+  el.classList.add('top');
+  ui.ft=G.teams[0].form?(G.teams[1].form?0:1):0;
+  const draw=()=>{
+    const T=G.teams[ui.ft], col=colorHex(ui.ft)||'#f6c453';
+    el.innerHTML=`<p class="mini">هر بازیکن ترکیب تیم خودش رو انتخاب می‌کنه</p>
+      <div class="seg">${[0,1].map(i=>`<button class="segb ${i===ui.ft?'on':''}" data-seg="${i}">${JERSEY(i)}<b>${esc(tname(i))}</b><small>${G.teams[i].form?fa(G.teams[i].form):'انتخاب نشده'}</small></button>`).join('')}</div>
+      <div class="grid">${FORMS.map(f=>`<button class="fm ${T.form===f?'sel':''}" data-f="${f}">${miniPitch(f,col)}<b>${fa(f)}</b></button>`).join('')}</div>`;
+    chrome();
+  };
+  el.addEventListener('click',e=>{
+    const s=e.target.closest('[data-seg]');
+    if(s){ ui.ft=+s.dataset.seg; draw(); return; }
+    const f=e.target.closest('[data-f]'); if(!f) return;
+    G.teams[ui.ft].form=f.dataset.f; draw();
+    if(!G.teams[1-ui.ft].form){
+      setTimeout(()=>{ if(stage.contains(el)){ ui.ft=1-ui.ft; draw(); } },350);
+    }
+  });
+  draw();
+};
+
+/* ---- سکه ---- */
+function showCoinRes(el){
+  const w=G.coin.winner;
+  el.querySelector('#coinres').innerHTML=`<div class="pop"><div class="big">سکه روی «${esc(tname(w))}» افتاد</div>
+    <p>اولین انتخاب با <b>${esc(tname(w))}</b> است ⚽<br>اول دروازه‌بان رو انتخاب می‌کنه</p></div>`;
+}
+const glowColor=t=>G.teams[t].color==='black'?'#f6c453':colorHex(t);
+SCREENS.coin=el=>{
+  const c0=colorHex(0), c1=colorHex(1);
+  const edges=Array.from({length:11},(_,i)=>`<i class="edge" style="transform:translateZ(${i-5}px)"></i>`).join('');
+  const face=(cls,t,c)=>`<div class="face ${cls}" style="--c:${c}"><i class="in"></i><i class="star">★ ★ ★</i><b class="lbl">${esc(tname(t))}</b><i class="shine"></i></div>`;
+  el.innerHTML=`<div class="vs"><span><i class="dot" style="--c:${c0}"></i><em>${esc(tname(0))}</em></span><b>در برابر</b><span><i class="dot" style="--c:${c1}"></i><em>${esc(tname(1))}</em></span></div>
+    <div class="toss" id="toss"><i class="cshadow" id="cshadow"></i><div class="hop" id="hop"><div class="coin" id="coin">${edges}${face('f',0,c0)}${face('b',1,c1)}</div></div></div>
+    <div class="coinres" id="coinres"><p>روی سکه بزن یا دکمه‌ی پایین رو بزن تا پرتاب بشه</p></div>`;
+  ui.coinAngle=G.coin?G.coin.angle:0;
+  const box=el.querySelector('#toss');
+  el.querySelector('#coin').style.transform=`rotateX(${ui.coinAngle}deg)`;
+  box.addEventListener('click',()=>{ if(!G.coin&&!ui.busy) toss(); });
+  if(G.coin){ box.style.setProperty('--wc',glowColor(G.coin.winner)); box.classList.add('won'); showCoinRes(el); }
+};
+function celebrate(box,w){
+  const sc=glowColor(w);
+  box.style.setProperty('--wc',sc); box.classList.add('won');
+  const frag=document.createDocumentFragment();
+  const ring=document.createElement('i'); ring.className='ring'; ring.style.setProperty('--sc',sc); frag.appendChild(ring);
+  for(let i=0;i<24;i++){
+    const s=document.createElement('i'); s.className='spark';
+    const a=Math.random()*Math.PI*2, d=85+Math.random()*85;
+    s.style.setProperty('--dx',(Math.cos(a)*d).toFixed(0)+'px');
+    s.style.setProperty('--dy',(Math.sin(a)*d).toFixed(0)+'px');
+    s.style.setProperty('--sc',i%2?sc:'#ffd77a');
+    s.style.animationDelay=(Math.random()*90).toFixed(0)+'ms';
+    frag.appendChild(s);
+  }
+  box.appendChild(frag);
+  setTimeout(()=>box.querySelectorAll('.spark,.ring').forEach(n=>n.remove()),1300);
+}
+function toss(){
+  const el=stage.querySelector('.screen'); if(!el||ui.busy||G.coin) return;
+  const box=el.querySelector('#toss'), hop=el.querySelector('#hop'), coin=el.querySelector('#coin'), sh=el.querySelector('#cshadow');
+  ui.busy=true; chrome();
+  box.classList.remove('won');
+  el.querySelector('#coinres').innerHTML='<p>سکه در هواست...</p>';
+  const winner=Math.random()<.5?0:1;
+  const A0=ui.coinAngle||0;
+  const AF=Math.ceil((A0+1)/360)*360+360*6+(winner?180:0);   // روی صفر = تیم ۱، روی ۱۸۰ = تیم ۲
+  const CR=170, FL=1350, LAND=CR+FL, WOB=1500, END=LAND+WOB, H=150;
+  let t0=null, lastHalf=Math.floor(A0/180), lastSign=0, flicked=false;
+  const bounced=[false,false,false];
+  function set(y,s,ax,az,h){
+    hop.style.transform=`translateY(${y.toFixed(1)}px) scale(${s.toFixed(3)})`;
+    coin.style.transform=`rotateZ(${az.toFixed(2)}deg) rotateX(${ax.toFixed(2)}deg)`;
+    coin.style.setProperty('--b',(.72+.4*Math.abs(Math.cos(ax*Math.PI/180))).toFixed(3));
+    sh.style.transform=`scale(${(1-.6*h).toFixed(3)})`; sh.style.opacity=(1-.75*h).toFixed(3);
+  }
+  function finish(show){
+    set(0,1,AF,0,0); ui.coinAngle=AF; G.coin={winner,angle:AF}; ui.busy=false;
+    if(show&&stage.contains(el)){ celebrate(box,winner); showCoinRes(el); SFX.chime(); }
+    chrome();
+  }
+  function frame(now){
+    if(t0===null) t0=now;
+    const t=now-t0;
+    if(!stage.contains(el)){ finish(false); return; }
+    if(t<CR){                                   // آماده‌ی پرتاب با شست
+      const k=Math.sin(t/CR*Math.PI); set(7*k,1-.05*k,A0,0,0);
+    } else if(t<LAND){                          // پرواز: بالا می‌ره، می‌چرخه، میاد پایین
+      if(!flicked){ flicked=true; SFX.flick(); SFX.whoosh(FL/1000); }
+      const p=(t-CR)/FL, h=4*p*(1-p);
+      const ang=A0+(AF-A0)*(.7*p+.3*p*(2-p));
+      const half=Math.floor(ang/180);
+      if(half!==lastHalf){ lastHalf=half; SFX.tick(.03+.05*h); }
+      set(-H*h,1+.38*h,ang,14*Math.sin(p*Math.PI),h);
+    } else if(t<END){                           // فرود، دو بار جهش، بعد لق می‌خوره و می‌خوابه
+      const bt=t-LAND, w=bt/1000, dec=Math.exp(-w/.42);
+      const ph=2*Math.PI*(4.5*w+7*w*w);
+      const s=Math.sin(ph);
+      let y=0;
+      if(bt<240) y=-24*Math.sin(bt/240*Math.PI);
+      else if(bt<390) y=-8*Math.sin((bt-240)/150*Math.PI);
+      if(!bounced[0]){ bounced[0]=true; SFX.land(1); }
+      if(bt>=240&&!bounced[1]){ bounced[1]=true; SFX.land(.55); }
+      if(bt>=390&&!bounced[2]){ bounced[2]=true; SFX.land(.3); }
+      const sg=s>=0?1:-1;
+      if(bt>400&&sg!==lastSign&&dec>.06) SFX.rattle(dec);
+      lastSign=sg;
+      set(y,1,AF+38*dec*s,10*dec*Math.cos(ph),-y/H);
+    } else { finish(true); return; }
+    requestAnimationFrame(frame);
+  }
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ finish(true); return; }
+  requestAnimationFrame(frame);
+}
+
+/* ================= بانک بازیکن‌ها ================= */
+// اسم انگلیسی | اسم فارسی | پست‌ها | اورال (پشت صحنه، کاربر نمی‌بینه). ترتیب = از معروف به کمتر معروف
+const RAW=`Neuer|مانوئل نویر|GK|95
+Buffon|جانلوئیجی بوفون|GK|94
+Casillas|ایکر کاسیاس|GK|93
+Courtois|تیبو کورتوا|GK|93
+Yashin|لف یاشین|GK|94
+Kahn|الیور کان|GK|93
+Schmeichel|پیتر شمایکل|GK|92
+Alisson|علیسون بکر|GK|89
+Ter Stegen|مارک‌آندره تر اشتگن|GK|91
+E. Martínez|امیلیانو دیبو مارتینز|GK|90
+Oblak|یان اوبلاک|GK|91
+Čech|پتر چک|GK|91
+Ederson|ادرسون|GK|90
+Navas|کیلور ناواس|GK|89
+Dida|دیدا|GK|88
+Messi|لیونل مسی|RW,CF,ST|99
+Cristiano Ronaldo|کریستیانو رونالدو|ST,LW|95
+Maradona|دیگو مارادونا|CF,ST,LW|98
+Pelé|پله|ST,CF|98
+Ronaldinho|رونالدینیو|LW,CF|95
+Ronaldo Nazário|رونالدو نازاریو|ST|96
+Zidane|زین‌الدین زیدان|CDM,CM,CAM|95
+Mbappé|کیلیان امباپه|LW,ST|95
+Neymar|نیمار|LW,CF|93
+Cruyff|یوهان کروایف|ST,CF,LW|96
+Haaland|ارلینگ هالند|ST|94
+Henry|تیری آنری|LW,ST|94
+Maldini|پائولو مالدینی|LB,CB|94
+Beckenbauer|فرانتس بکن‌باوئر|CB|95
+Iniesta|آندرس اینیستا|CM,CAM,LM|94
+Xavi|ژاوی هرناندز|CM|94
+Modrić|لوکا مودریچ|CM,CAM|93
+Kroos|تونی کروس|CM,CDM|93
+De Bruyne|کوین دی‌بروینه|CM,CAM,RM|94
+Pirlo|آندرئا پیرلو|CDM,CM|93
+Lampard|فرانک لمپارد|CM,CAM|93
+Gerrard|استیون جرارد|CM,RM|94
+Scholes|پل اسکولز|CM,CAM|92
+Ramos|سرخیو راموس|CB,RB|94
+Van Dijk|ویرجیل فن‌دایک|CB|94
+Nesta|آلساندرو نستا|CB|95
+Cannavaro|فابیو کاناوارو|CB|93
+Roberto Carlos|روبرتو کارلوس|LB|95
+Cafu|کافو|RB,RM|94
+Lewandowski|رابرت لواندوفسکی|ST|93
+Benzema|کریم بنزما|ST,CF|93
+Suárez|لوئیس سوارز|ST,RW|93
+Ibrahimović|زلاتان ابراهیموویچ|ST|93
+Salah|محمد صلاح|RW,ST|93
+Kane|هری کین|ST,CF|92
+Kanté|انگولو کانته|CDM,CM|93
+Busquets|سرخیو بوسکتس|CDM|92
+Pogba|پل پوگبا|CM,CAM|90
+Zico|زیکو|CAM,CF|93
+Sócrates|سقراط|CM,CAM|92
+Özil|مسوت اوزیل|CAM,CF|92
+Rodri|رودری|CDM,CM|92
+Casemiro|کاسمیرو|CDM|91
+Roy Keane|روی کین|CDM,CM|93
+Gullit|رود خولیت|CM,CAM,ST|93
+Matthäus|لوتار ماتئوس|CB,CDM,CM|93
+Pedri|پدری|CM,CAM|91
+Bellingham|جود بلینگهام|CAM,CM|91
+Valverde|فدریکو والورده|CM,RM|91
+Puyol|کارلس پویول|CB,RB|93
+Baresi|فرانکو بارزی|CB,LB|94
+Chiellini|جورجو کیه‌لینی|CB,LB|93
+T. Silva|تیاگو سیلوا|CB|92
+Piqué|ژرار پیکه|CB|91
+Ferdinand|ریو فردیناند|CB|92
+Terry|جان تری|CB|92
+Stam|یاپ استام|CB|92
+Vidić|نمانیا ویدیچ|CB|91
+Rúben Dias|روبن دیاس|CB|93
+Kompany|وینسنت کمپانی|CB|91
+Marquinhos|مارکینیوس|CB|91
+Thuram|لیلیان تورام|CB,RB|91
+Militão|ادر میلیتائو|CB,RB|88
+Lahm|فیلیپ لام|LB,RB|93
+Dani Alves|دانی آلوس|RB|92
+Marcelo|مارسلو|LB|92
+Ashley Cole|آشلی کول|LB|90
+Jordi Alba|ژوردی آلبا|LB|90
+Davies|آلفونسو دیویس|LB,LM|91
+Hakimi|اشرف حکیمی|RB,RM|91
+Kimmich|جاشوا کیمیش|RB,CDM|91
+T. Hernández|تئو هرناندز|LB|90
+Abidal|آبیدال|LB|88
+Lizarazu|لیزارازو|RB|89
+Jorginho|ژورژینیو|RB,CDM|88
+Cancelo|ژائو کانسلو|RB,LB|90
+Evra|پاتریس اورا|LB|89
+Vinícius Jr|وینیسیوس جونیور|LW|92
+Robben|آریین روبن|RW|92
+Ribéry|فرانک ریبری|LW,CF|92
+Drogba|دیدیه دروگبا|ST|92
+Shevchenko|آندری شوچنکو|ST,LW|93
+Romário|روماریو|ST|94
+Baggio|روبرتو باجو|CF,ST|93
+Batistuta|گابریل باتیستوتا|ST|92
+Van Basten|مارکو فن‌باستن|ST|94
+Gerd Müller|گرد مولر|ST|93
+Garrincha|گارینچا|RW|94
+Owen|مایکل اوئن|ST|90
+Griezmann|آنتوان گریزمان|ST,CF,LW|91
+Bale|گرت بیل|RW,LW|92
+Mané|سادیو مانه|LW,ST|90
+Foden|فیل فودن|LW,CF|89
+Saka|بوکایو ساکا|RW|88
+Dembélé|عثمان دمبله|RW,LW|88
+João Félix|ژائو فلیکس|CF,ST|88
+Forlán|دیگو فورلان|ST,CF|89
+Cavani|ادینسون کاوانی|ST,RW|89
+Villa|داوید ویا|ST,LW|89
+Lukaku|رومئلو لوکاکو|ST|89
+Mario Gómez|ماریو گومز|ST|88
+Wijnaldum|وینالدوم|CM,CDM|89
+Gündoğan|ایلکای گوندوغان|CM|89
+Camavinga|ادواردو کاماوینگا|CDM,CM,LM|89
+Fernandinho|فرناندینیو|CDM|88
+Zieliński|زیلینسکی|CM|88
+Desailly|دسایی|CDM,CM|88`;
+const PL=RAW.split('\n').map((l,i)=>{ const [en,fa,ps,ov]=l.split('|'); return {id:i,en,fa,pos:ps.split(','),ov:+ov,gk:ps==='GK'}; });
+/* ویژگی‌های پشت‌صحنه برای موتور بازی (تاثیر | استثنایی) */
+const TRP=`Yashin|gsave,come,lead|reflx
+Buffon|gsave,asave,lead|reflx
+Casillas|gsave,come,refl|reflx
+Neuer|feet,come,lpass|sweep
+Kahn|gsave,asave,lead|leadx
+Schmeichel|asave,come,lpass|leadx
+Ter Stegen|feet,lpass,gsave|thru
+Oblak|gsave,asave,refl|pensv
+Courtois|asave,come,gsave|reflx
+Alisson|lpass,come,gsave|pensv
+E. Martínez|gsave,come,lead|pensv
+Navas|gsave,refl,asave|reflx
+Čech|gsave,asave,lead|reflx
+Ederson|lpass,feet,come|thru
+Dida|gsave,come,asave|pensv
+Maldini|air,tack,lead|blockx
+Cannavaro|tack,air,mark|duel
+Beckenbauer|build,lead,lpass|leadx
+Ramos|air,tack,lead|hdset
+Puyol|tack,block,lead|blockx
+Nesta|tack,mark,build|tackx
+T. Silva|tack,build,air|tackx
+Van Dijk|air,tack,lead|duel
+Piqué|build,lpass,tack|thru
+Ferdinand|build,tack,air|tackx
+Vidić|air,block,lead|hdset
+Stam|tack,mark,spd|duel
+Chiellini|tack,block,mark|duel
+Baresi|build,tack,lead|tackx
+Matthäus|lead,lpass,lsh|fkx
+Thuram|tack,air,mark|duel
+Rúben Dias|build,tack,lead|tackx
+Marquinhos|tack,air,block|blockx
+Terry|air,block,lead|blockx
+Kompany|tack,lead,air|hdset
+Militão|tack,spd,air|duel
+Cafu|spd,wing,cross|crossx
+Roberto Carlos|spd,lsh,wing|fkx
+Lahm|key,tack,cross|thru
+Dani Alves|spd,cross,drib|crossx
+Marcelo|drib,key,wing|dribx
+Ashley Cole|tack,spd,mark|duel
+Jordi Alba|spd,key,cross|thru
+Davies|spd,drib,wing|burst
+Hakimi|spd,lsh,cross|burst
+Kimmich|key,tack,cross|thru
+T. Hernández|spd,lsh,wing|burst
+Abidal|cross,tack,wing|crossx
+Lizarazu|tack,wing,cross|duel
+Jorginho|key,tack,ctrl|penx
+Cancelo|drib,key,cross|thru
+Evra|spd,tack,wing|burst
+Zidane|fin,lpass,helpd|hdset
+Xavi|key,ctrl,press|thru
+Iniesta|drib,key,ctrl|dribx
+Modrić|key,drib,ctrl|thru
+Kroos|lpass,ctrl,lsh|thru
+Pirlo|lpass,ctrl,key|fkx
+Lampard|lsh,key,fin|penx
+Gerrard|lsh,lpass,lead|fkx
+Scholes|lsh,lpass,fin|lshx
+Busquets|press,helpd,ctrl|icpt
+Pogba|lpass,drib,lsh|thru
+Kanté|press,helpd,engine|icpt
+De Bruyne|key,lsh,cross|thru
+Pedri|drib,key,ctrl|dribx
+Bellingham|fin,drib,press|box
+Gullit|air,fin,key|headx
+Zico|fk,key,drib|fkx
+Sócrates|key,ctrl,lpass|thru
+Roy Keane|press,helpd,lead|icpt
+Özil|key,ctrl,lpass|thru
+Rodri|ctrl,press,helpd|icpt
+Casemiro|press,helpd,lpass|icpt
+Gündoğan|key,ctrl,lsh|box
+Fernandinho|press,helpd,lpass|icpt
+Camavinga|drib,press,helpd|icpt
+Valverde|engine,lsh,cross|lshx
+Wijnaldum|press,lpass,ctrl|icpt
+Zieliński|key,ctrl,press|thru
+Desailly|press,helpd,engine|icpt
+Messi|drib,key,fin|dribx
+Cristiano Ronaldo|head,fin|twof,dribx
+Pelé|fin,drib,head|twof
+Maradona|drib,key,fin|dribx
+Ronaldinho|drib,key,fk|dribx
+Ronaldo Nazário|spd,drib,fin|dribx
+Cruyff|drib,key,fin|thru
+Henry|spd,fin,behind|burst
+Mbappé|spd,fin,drib|burst
+Haaland|fin,spd,behind|finx
+Lewandowski|fin,head,behind|finx
+Benzema|key,fin,head|thru
+Suárez|fin,drib,press|finx
+Neymar|drib,key,spd|dribx
+Ibrahimović|head,fin,drib|acro
+Shevchenko|fin,spd,behind|twof
+Kane|fin,key,head|penx
+Salah|spd,drib,fin|dribx
+Vinícius Jr|spd,drib,behind|burst
+Lukaku|fin,head,power|finx
+Robben|spd,drib,lsh|dribx
+Ribéry|spd,drib,key|dribx
+Drogba|head,fin,power|headx
+Owen|spd,fin,behind|burst
+Romário|fin,drib,behind|finx
+Baggio|key,drib,fin|penx
+Batistuta|lsh,fin,head|lshx
+Mario Gómez|head,fin,behind|finx
+Gerd Müller|fin,behind,head|finx
+Van Basten|fin,head,drib|acro
+Garrincha|drib,spd,cross|dribx
+Forlán|lsh,fin,key|lshx
+Cavani|press,fin,behind|finx
+Saka|drib,cross,press|twof
+Foden|drib,key,lsh|twof
+João Félix|drib,key,fin|dribx
+Dembélé|spd,drib,cross|twof
+Mané|spd,drib,fin|burst
+Bale|spd,lsh,head|burst
+Griezmann|key,fin,press|finx
+Villa|fin,lsh,behind|finx`;
+const TRC=`Guardiola|ctrl,press,tact|regroup
+Ferguson|cnt,psy,tact|goldsub
+Mourinho|park,cnt,psy|psyx
+Ancelotti|tact,ctrl,cnt|goldsub
+Klopp|press,cnt,psy|regroup
+Zidane|tact,cnt,psy|goldsub
+Wenger|ctrl,cnt,press|psyx
+Cruyff|ctrl,press,tact|regroup
+Michels|press,ctrl,cnt|psyx
+Sacchi|press,park,tact|psyx
+Lippi|park,cnt,tact|goldsub
+Flick|press,ctrl,cnt|regroup
+Del Bosque|ctrl,park,tact|psyx
+Simeone|park,cnt,psy|psyx
+Mancini|tact,park,ctrl|goldsub
+Ten Hag|ctrl,press,tact|regroup
+Arteta|press,ctrl,tact|psyx
+Xavi|ctrl,press,cnt|regroup
+Nagelsmann|press,tact,cnt|goldsub
+Conte|park,cnt,psy|psyx`;
+const TRM={}; TRP.split('\n').forEach(l=>{const [e,i,x]=l.split('|'); TRM['p:'+e]={im:i.split(','),ex:x.split(',')};});
+TRC.split('\n').forEach(l=>{const [e,i,x]=l.split('|'); TRM['c:'+e]={im:i.split(','),ex:x.split(',')};});
+PL.forEach(p=>Object.assign(p,TRM['p:'+p.en]));
+
+const POSC={GK:'#f6c453',CB:'#5aa7ff',RB:'#5aa7ff',LB:'#5aa7ff',CDM:'#4ade80',CM:'#4ade80',CAM:'#4ade80',RM:'#4ade80',LM:'#4ade80',ST:'#ff6b6b',RW:'#ff6b6b',LW:'#ff6b6b',CF:'#ff6b6b'};
+const SLOTFA={GK:'دروازه‌بان',CB:'دفاع وسط',RB:'دفاع راست',LB:'دفاع چپ',CDM:'هافبک دفاعی',CM:'هافبک وسط',CAM:'هافبک هجومی',RM:'هافبک راست',LM:'هافبک چپ',CF:'پشت مهاجم',RW:'مهاجم راست',ST:'مهاجم نوک',LW:'مهاجم چپ'};
+const PRI=['GK','CB','RB','LB','CDM','CM','CAM','RM','LM','CF','RW','ST','LW'];
+const EQ={RM:'RW',RW:'RM',LM:'LW',LW:'LM'};            // کناری‌ها با هم هم‌ارزن
+const LINES={
+ '4-4-2':[['RB','CB','CB','LB'],['RM','CM','CM','LM'],['ST','ST']],
+ '4-3-3':[['RB','CB','CB','LB'],['CM','CM','CM'],['RW','ST','LW']],
+ '4-2-3-1':[['RB','CB','CB','LB'],['CDM','CDM'],['RM','CAM','LM'],['ST']],
+ '4-5-1':[['RB','CB','CB','LB'],['RM','CM','CM','CM','LM'],['ST']],
+ '3-5-2':[['CB','CB','CB'],['RM','CM','CM','CM','LM'],['ST','ST']],
+ '3-4-3':[['CB','CB','CB'],['RM','CM','CM','LM'],['RW','ST','LW']],
+ '5-3-2':[['RB','CB','CB','CB','LB'],['CM','CM','CM'],['ST','ST']],
+ '4-1-4-1':[['RB','CB','CB','LB'],['CDM'],['RM','CM','CM','LM'],['ST']],
+ '4-4-1-1':[['RB','CB','CB','LB'],['RM','CM','CM','LM'],['CF'],['ST']],
+ '5-4-1':[['RB','CB','CB','CB','LB'],['RM','CM','CM','LM'],['ST']]
+};
+const fits=(p,c)=>c==='GK'?!!p.gk:(!p.gk&&(p.pos.includes(c)||(!!EQ[c]&&p.pos.includes(EQ[c]))));
+function buildSlots(f){
+  const L=LINES[f], n=L.length, out=[{c:'GK',x:50,y:90}];
+  L.forEach((ln,li)=>{ const y=74-li*(60/(n-1||1)); ln.forEach((c,j)=>out.push({c,x:100-100*(j+1)/(ln.length+1),y})); });
+  return out;
+}
+const PART=['de','van','ter','da'];
+function short(p){
+  const w=p.en.split(' ');
+  if(w.length===1||PART.includes(w[0].toLowerCase())) return p.en;
+  return w[0][0]+'. '+w.slice(1).join(' ');
+}
+
+/* جستجوی هوشمند: فارسی/انگلیسی، غلط‌نویسی و صداهای مشابه */
+function nfa(s){
+  s=String(s).toLowerCase().normalize('NFD').replace(/[̀-ًͯ-ٰٟـ‌‍]/g,'');
+  s=s.replace(/[يى]/g,'ی').replace(/ك/g,'ک').replace(/[ةۀ]/g,'ه').replace(/[أإآٱ]/g,'ا').replace(/ؤ/g,'و').replace(/ئ/g,'ی')
+     .replace(/[ثص]/g,'س').replace(/[ذضظ]/g,'ز').replace(/ط/g,'ت').replace(/ح/g,'ه').replace(/غ/g,'ق');
+  return s.replace(/[^a-z0-9؀-ۿ\s]/g,' ').replace(/\s+/g,' ').trim();
+}
+function lev(a,b){
+  const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let prev=Array.from({length:n+1},(_,i)=>i);
+  for(let i=1;i<=m;i++){ const cur=[i];
+    for(let j=1;j<=n;j++) cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    prev=cur; }
+  return prev[n];
+}
+PL.forEach(p=>{ p._k=[nfa(p.en),nfa(p.fa)].map(s=>({full:s.replace(/ /g,''),words:s.split(' ')})); });
+function qscore(p,nq){
+  const q=nq.replace(/ /g,''); if(!q) return 0;
+  const thr=q.length<=3?0:q.length<=6?1:2; let best=null;
+  for(const f of p._k){
+    if(f.full.includes(q)) return 0;
+    for(const w of f.words){
+      if(w.startsWith(q)) return 0;
+      const d=Math.min(lev(w,q),lev(w.slice(0,q.length),q));
+      if(d<=thr&&(best===null||d+1<best)) best=d+1;
+    }
+  }
+  return best;
+}
+
+/* ================= صفحه‌ی انتخاب بازیکن ================= */
+let D=null;
+const TOTAL=29;                                   // ۲۲ بازیکن + ۲ مربی + ۱ داور + ۲ پنالتی‌زن + ۲ ایستگاهی‌زن
+Object.assign(POSC,{COACH:'#c084fc',REF:'#cbd5e1'});
+const COACH_RAW=`Guardiola|پپ گواردیولا|96
+Ferguson|الکس فرگوسن|97
+Mourinho|ژوزه مورینیو|94
+Klopp|یورگن کلوپ|94
+Ancelotti|کارلو آنچلوتی|95
+Zidane|زین‌الدین زیدان|94
+Wenger|آرسن ونگر|93
+Simeone|دیگو سیمئونه|93
+Cruyff|یوهان کروایف|94
+Lippi|مارچلو لیپی|93
+Conte|آنتونیو کنته|92
+Del Bosque|ویسنته دل‌بوسکه|92
+Michels|رینوس میکلز|93
+Sacchi|آریگو ساکی|93
+Flick|هانزی فلیک|91
+Mancini|روبرتو مانچینی|90
+Arteta|میکل آرتتا|90
+Xavi|ژاوی هرناندز|89
+Ten Hag|اریک تن‌هاخ|88
+Nagelsmann|یولین ناگلزمن|88`;
+const REF_RAW=`Collina|پیرلوئیجی کولینا|strict
+Faghani|علیرضا فغانی|mid
+Webb|هاورد وب|mid
+Busacca|ماسیمو بوساکا|strict
+Lahoz|آنتونیو ماتئو لاهوز|pen
+Marciniak|شیمون مارچینیاک|mid
+Klattenburg|مارک کلاتنبرگ|lax`;
+const COACHES=COACH_RAW.split('\n').map((l,i)=>{ const [en,fa,ov]=l.split('|'); return {id:i,k:'coach',en,fa,ov:+ov,pos:['COACH']}; });
+COACHES.forEach(p=>Object.assign(p,TRM['c:'+p.en]));
+const REFS=REF_RAW.split('\n').map((l,i)=>{ const [en,fa,tr]=l.split('|'); return {id:i,k:'ref',en,fa,tr,pos:['REF']}; });
+[...COACHES,...REFS].forEach(p=>{ p._k=[nfa(p.en),nfa(p.fa)].map(s=>({full:s.replace(/ /g,''),words:s.split(' ')})); });
+
+const BUST=(fill,acc)=>`<svg class="bust" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="19" r="10" fill="#e7c9a5" stroke="rgba(255,255,255,.55)" stroke-width="1.5"/><path d="M10 60c0-14 9-24 22-24s22 10 22 24z" fill="${fill}" stroke="rgba(255,255,255,.55)" stroke-width="2" stroke-linejoin="round"/>${acc}</svg>`;
+const COACHI=t=>BUST(colorHex(t)||'#3a4160',`<path d="M32 38l-4 5 4 15 4-15z" fill="${G.teams[t].color==='white'?'#1b1d24':'#fff'}"/>`);
+const REFI=()=>BUST('#15171d','<path d="M23 37l9 9 9-9" fill="none" stroke="#f6c453" stroke-width="3" stroke-linejoin="round"/><rect x="37" y="22" width="13" height="5" rx="2.5" fill="#f6c453"/><circle cx="49" cy="24.5" r="3.6" fill="#f6c453"/>');
+const iconFor=(p,t)=>p.k==='coach'?COACHI(t):p.k==='ref'?REFI():JERSEY(t);
+const UNDO_SVG='<svg viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 010 12h-3"/></svg>';
+
+function newDraft(sig){
+  const w=G.coin?G.coin.winner:0;
+  const slots=[0,1].map(t=>buildSlots(G.teams[t].form));
+  const ord=slots.map(ss=>ss.map((s,i)=>i).sort((a,b)=>PRI.indexOf(ss[a].c)-PRI.indexOf(ss[b].c)||ss[a].x-ss[b].x));
+  const seq=[]; for(let k=0;k<11;k++){ seq.push({k:'p',t:w,sid:ord[w][k]}); seq.push({k:'p',t:1-w,sid:ord[1-w][k]}); }
+  seq.push({k:'c',t:w},{k:'c',t:1-w},{k:'r'},{k:'pen',t:w},{k:'pen',t:1-w},{k:'set',t:w},{k:'set',t:1-w});
+  return {sig,slots,seq,pos:0,pick:[Array(11).fill(null),Array(11).fill(null)],taken:new Set(),
+    coach:[null,null],takenC:new Set(),ref:null,pen:[null,null],set:[null,null],sel:null,q:'',view:0};
+}
+const pills=(p,c)=>p.pos.map(x=>c?(x===c?`<i class="fit" style="--pc:#34d399">${x}</i>`:EQ[c]===x?`<i class="eq" style="--pc:#34d399">${x}</i>`:`<i class="no" style="--pc:#ff6b6b">${x}</i>`):`<i style="--pc:${POSC[x]}">${x}</i>`).join('');
+const selItem=c=>D.sel==null?null:(c.k==='r'?REFS[D.sel]:c.k==='c'?COACHES[D.sel]:PL[D.sel]);
+
+const nmHTML=p=>{ const n=short(p).length; return `<span class="nm${n>10?' xl':n>7?' lg':''}">${esc(short(p))}</span>`; };
+function pitchHTML(t,mode){
+  const rows={}; D.slots[t].forEach(s=>{ const k=s.y.toFixed(1); rows[k]=(rows[k]||0)+1; });
+  const cur=mode==='p'?D.seq[D.pos]:null, tk=mode==='tk'?D.seq[D.pos]:null;
+  const sl=D.slots[t].map((s,i)=>{
+    const pk=D.pick[t][i]; let cls='slot', inner;
+    let bd=(D.pen[t]===i?'<b class="bd">P</b>':'')+(D.set[t]===i?'<b class="bd sb">S</b>':'');
+    if(pk){
+      const p=PL[pk.pid]; if(pk.wrong) cls+=' bad';
+      if(tk&&D.sel===pk.pid){ cls+=' tkp'; bd+=tk.k==='set'?'<b class="bd sb">S</b>':'<b class="bd">P</b>'; }
+      inner=`<span class="jw">${JERSEY(t)}${bd}</span>${nmHTML(p)}`;
+    } else if(cur&&cur.t===t&&cur.sid===i){
+      cls+=' cur';
+      if(D.sel!=null){ const p=PL[D.sel]; cls+=' prev'; if(!fits(p,s.c)) cls+=' bad'; inner=`${JERSEY(t)}${nmHTML(p)}`; }
+      else inner=`<span class="ph">${s.c}</span>`;
+    } else inner=`<span class="ph">${s.c}</span>`;
+    const nw=(100/(rows[s.y.toFixed(1)]+1)-.5).toFixed(1);
+    return `<div class="${cls}" style="left:${s.x.toFixed(1)}%;top:${s.y.toFixed(1)}%;--nw:${nw}cqw">${inner}</div>`;
+  }).join('');
+  return `<div class="pitch"><svg class="pl" viewBox="0 0 100 130" preserveAspectRatio="none" aria-hidden="true"><g fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1.2"><rect x="3" y="3" width="94" height="124"/><line x1="3" y1="65" x2="97" y2="65"/><circle cx="50" cy="65" r="11"/><rect x="26" y="3" width="48" height="20"/><rect x="26" y="107" width="48" height="20"/></g></svg>${sl}</div>`;
+}
+function stageHTML(c){
+  const it=selItem(c);
+  const icon=c.k==='r'?REFI():COACHI(c.t);
+  const head=c.k==='r'?'داور بازی':'مربی '+tname(c.t);
+  const sub=c.k==='r'?`${tname(0)} در برابر ${tname(1)}`:`ترکیب ${fa(G.teams[c.t].form)}`;
+  return `<div class="stagec">${icon}<div class="sh">${esc(head)}</div><small>${esc(sub)}</small>${it?`<div class="sel pop"><b>${esc(it.en)}</b><span>${esc(it.fa)}</span></div>`:'<div class="sel q">؟</div>'}</div>`;
+}
+function listItems(c){
+  if(c.k==='p'){ const sc=D.slots[c.t][c.sid].c; return PL.filter(p=>c.k==='p'&&(sc==='GK'?p.gk:!p.gk)).map(p=>({p,fit:fits(p,sc),tier:sc==='GK'||p.pos.includes(sc)?0:(EQ[sc]&&p.pos.includes(EQ[sc]))?1:2,taken:D.taken.has(p.id)})); }
+  if(c.k==='c') return COACHES.map(p=>({p,fit:false,taken:D.takenC.has(p.id)}));
+  if(c.k==='r') return REFS.map(p=>({p,fit:false,taken:false}));
+  return D.pick[c.t].map(pk=>pk&&PL[pk.pid]).filter(p=>p&&!p.gk).map(p=>({p,fit:false,taken:false}));
+}
+
+SCREENS.draft=el=>{
+  const w=G.coin?G.coin.winner:0, sig=`${G.teams[0].form}|${G.teams[1].form}|${w}`;
+  if(!D||D.sig!==sig) D=newDraft(sig);
+  el.classList.add('dr');
+  el.innerHTML=`<div class="turn" id="dturn"><span id="djer"></span><div class="tx"><div class="t1" id="dt1"></div><small id="dt2"></small></div><input class="tin" id="dq" dir="auto" autocomplete="off" spellcheck="false" placeholder="جستجو..."><button class="icon undo" id="dundo" aria-label="برگشت">${UNDO_SVG}</button></div><div class="pwrap" id="dpw"></div><div class="strip" id="dstrip"></div>`;
+  const turn=el.querySelector('#dturn'), pw=el.querySelector('#dpw'), strip=el.querySelector('#dstrip'), q=el.querySelector('#dq');
+  const done=()=>D.pos>=TOTAL;
+  function drawTop(){
+    if(done()){
+      turn.hidden=true; strip.hidden=true; pw.className='dwrap';
+      const t=D.view||0;
+      pw.innerHTML=`<div class="tabs">${[0,1].map(i=>`<button class="tab${i===t?' on':''}" data-view="${i}">${JERSEY(i)}<b>${esc(tname(i))}</b><small>${esc(G.teams[i].form)}</small></button>`).join('')}</div><div class="pwrap">${pitchHTML(t,false)}</div><div class="cbar">${COACHI(t)}<span>${esc(COACHES[D.coach[t]].en)}</span></div><div class="refbar"><span>داور: <b>${esc(REFS[D.ref].en)}</b></span><button class="icon undo" id="dundo" aria-label="برگشت">${UNDO_SVG}</button></div>`;
+      return;
+    }
+    turn.hidden=false; strip.hidden=false; pw.className='pwrap';
+    const c=D.seq[D.pos];
+    let icon,name,sub;
+    if(c.k==='r'){ icon=REFI(); name='انتخاب داور'; sub='با توافق هر دو نفر'; }
+    else{
+      icon=JERSEY(c.t); name='نوبت '+tname(c.t);
+      sub=c.k==='p'?SLOTFA[D.slots[c.t][c.sid].c]+' رو انتخاب کن':c.k==='c'?'مربی رو انتخاب کن':c.k==='pen'?'پنالتی‌زن رو انتخاب کن':'ایستگاهی‌زن رو انتخاب کن';
+    }
+    el.querySelector('#djer').innerHTML=icon;
+    el.querySelector('#dt1').innerHTML=`${esc(name)} <span class="cn">(${fa(D.pos+1)} از ${fa(TOTAL)})</span>`;
+    el.querySelector('#dt2').textContent=sub;
+    el.querySelector('#dundo').disabled=!D.pos;
+    pw.innerHTML=c.k==='p'?pitchHTML(c.t,'p'):(c.k==='c'||c.k==='r')?stageHTML(c):pitchHTML(c.t,'tk');
+  }
+  function drawStrip(){
+    if(done()) return;
+    const c=D.seq[D.pos], nq=nfa(D.q), sc=c.k==='p'?D.slots[c.t][c.sid].c:null;
+    const list=listItems(c).map((x,i)=>({...x,i,s:qscore(x.p,nq)})).filter(x=>x.s!==null)
+      .sort((a,b)=>(a.taken-b.taken)||((a.tier||0)-(b.tier||0))||(a.s-b.s)||(a.i-b.i));
+    strip.innerHTML=list.length?list.map(({p,taken,tier})=>`<button class="pc${D.sel===p.id?' sel':''}${taken?' off':''}${tier===2?' bad':''}" data-id="${p.id}">${iconFor(p,c.t)}<b class="en">${esc(p.en)}</b><span class="fa">${esc(p.fa)}</span><span class="pp">${pills(p,sc)}</span></button>`).join(''):'<div class="nores">پیدا نشد 🤔</div>';
+    strip.scrollLeft=0;
+  }
+  function all(){ q.value=D.q; drawTop(); drawStrip(); }
+  el._dr=all;
+  el.addEventListener('click',e=>{
+    const b=e.target.closest('.pc');
+    if(b){ D.sel=+b.dataset.id; strip.querySelectorAll('.pc').forEach(x=>x.classList.toggle('sel',+x.dataset.id===D.sel)); drawTop(); chrome(); return; }
+    const tb=e.target.closest('.tab');
+    if(tb){ D.view=+tb.dataset.view; drawTop(); return; }
+    if(e.target.closest('#dundo')&&D.pos>0){
+      const l=D.seq[--D.pos];
+      if(l.k==='p'){ const pk=D.pick[l.t][l.sid]; D.taken.delete(pk.pid); D.pick[l.t][l.sid]=null; }
+      else if(l.k==='c'){ D.takenC.delete(D.coach[l.t]); D.coach[l.t]=null; }
+      else if(l.k==='r'){ D.ref=null; }
+      else if(l.k==='pen'){ D.pen[l.t]=null; }
+      else { D.set[l.t]=null; }
+      D.sel=null; D.q=''; all(); chrome();
+    }
+  });
+  q.addEventListener('input',()=>{ D.q=q.value; drawStrip(); });
+  all();
+};
+Object.assign(STEPS[4],{
+  hint:'',
+  ok:()=>!!D&&D.pos>=TOTAL,
+  ttl:()=>{
+    if(!D) return 'انتخاب بازیکن';
+    if(D.pos>=TOTAL) return 'آماده‌ی بازی';
+    return {p:'انتخاب بازیکن',c:'انتخاب مربی',r:'انتخاب داور',pen:'پنالتی‌زن',set:'ایستگاهی‌زن'}[D.seq[D.pos].k];
+  },
+  btn:()=>{
+    if(!D) return {label:'بعدی',enabled:false};
+    if(D.pos>=TOTAL) return {label:'بعدی',enabled:true};
+    const c=D.seq[D.pos], it=selItem(c);
+    if(!it) return {label:c.k==='c'?'یک مربی انتخاب کن':c.k==='r'?'یک داور انتخاب کن':'یک بازیکن انتخاب کن',enabled:false};
+    if(c.k==='c') return {label:'✓ تایید مربی: '+it.en,enabled:true};
+    if(c.k==='r') return {label:'✓ تایید داور: '+it.en,enabled:true};
+    if(c.k==='pen') return {label:'✓ مطمئنم: '+short(it)+' پنالتی می‌زنه',enabled:true};
+    if(c.k==='set') return {label:'✓ مطمئنم: '+short(it)+' ایستگاهی می‌زنه',enabled:true};
+    return {label:'✓ تایید '+it.en,enabled:true};
+  },
+  action:()=>{
+    if(!D||D.pos>=TOTAL) return false;
+    if(D.sel==null) return true;
+    const c=D.seq[D.pos];
+    if(c.k==='p'){ const p=PL[D.sel], sc=D.slots[c.t][c.sid].c; D.pick[c.t][c.sid]={pid:p.id,wrong:!fits(p,sc)}; D.taken.add(p.id); }
+    else if(c.k==='c'){ D.coach[c.t]=D.sel; D.takenC.add(D.sel); }
+    else if(c.k==='r'){ D.ref=D.sel; }
+    else { const sid=D.pick[c.t].findIndex(pk=>pk&&pk.pid===D.sel); (c.k==='pen'?D.pen:D.set)[c.t]=sid; }
+    D.pos++; D.sel=null; D.q='';
+    const el=stage.querySelector('.screen'); if(el&&el._dr) el._dr();
+    chrome(); return true;
+  }
+});
+
+/* ================= صدای ورزشگاه: تماشاچی، سوت، توپ ================= */
+const Arena=(()=>{
+  let c=null,nb=null,master=null,crowd=null,on=true,run=false;
+  function ctx(){
+    if(!on) return null;
+    if(!c){
+      const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null;
+      c=new AC(); master=c.createGain(); master.gain.value=.9; master.connect(c.destination);
+      nb=c.createBuffer(1,c.sampleRate*3,c.sampleRate);
+      const d=nb.getChannelData(0); let b0=0,b1=0,b2=0;
+      for(let i=0;i<d.length;i++){ const w=Math.random()*2-1; b0=.99765*b0+w*.099; b1=.963*b1+w*.2965; b2=.57*b2+w*1.05; d[i]=(b0+b1+b2+w*.18)*.22; }
+    }
+    if(c.state==='suspended') c.resume();
+    return c;
+  }
+  function src(a,loop){ const s=a.createBufferSource(); s.buffer=nb; s.loop=!!loop; return s; }
+  function startCrowd(){
+    const a=ctx(); if(!a||crowd) return; run=true;
+    const t=a.currentTime, out=a.createGain(); out.gain.value=.0001; out.connect(master);
+    const mk=(f,q,g,type)=>{ const s=src(a,true), fl=a.createBiquadFilter(), gg=a.createGain(); fl.type=type||'bandpass'; fl.frequency.value=f; fl.Q.value=q; gg.gain.value=g; s.connect(fl); fl.connect(gg); gg.connect(out); s.start(t,Math.random()*2); return {s,fl,gg}; };
+    const l1=mk(520,.45,1), l2=mk(1250,.6,.55), l3=mk(210,.5,1.1,'lowpass');
+    const lfo=a.createOscillator(), lg=a.createGain(); lfo.frequency.value=.17; lg.gain.value=.012; lfo.connect(lg); lg.connect(out.gain); lfo.start(t);
+    out.gain.exponentialRampToValueAtTime(.085,t+2.2);
+    crowd={out,l1,l2,l3,lfo};
+  }
+  function level(v,dur){ if(!crowd||!c) return; const t=c.currentTime; crowd.out.gain.cancelScheduledValues(t); crowd.out.gain.setValueAtTime(Math.max(crowd.out.gain.value,.0001),t); crowd.out.gain.exponentialRampToValueAtTime(Math.max(v,.0002),t+(dur||1)); }
+  function stopCrowd(){
+    if(!crowd||!c) return; const k=crowd, t=c.currentTime; crowd=null; run=false;
+    k.out.gain.cancelScheduledValues(t); k.out.gain.setValueAtTime(Math.max(k.out.gain.value,.0001),t); k.out.gain.exponentialRampToValueAtTime(.0001,t+.7);
+    setTimeout(()=>{ try{ k.l1.s.stop(); k.l2.s.stop(); k.l3.s.stop(); k.lfo.stop(); k.out.disconnect(); }catch(e){} },900);
+  }
+  function burst(type,f1,f2,q,v,dur,dl){
+    const a=ctx(); if(!a) return; const t=a.currentTime+(dl||0);
+    const s=src(a,false), fl=a.createBiquadFilter(), g=a.createGain();
+    fl.type=type; fl.Q.value=q; fl.frequency.setValueAtTime(f1,t); fl.frequency.exponentialRampToValueAtTime(f2,t+dur);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(v,t+dur*.3); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    s.connect(fl); fl.connect(g); g.connect(master); s.start(t,Math.random()*1.5); s.stop(t+dur+.05);
+  }
+  function tone(f,v,dur,dl,type){
+    const a=ctx(); if(!a) return; const t=a.currentTime+(dl||0);
+    const o=a.createOscillator(), g=a.createGain(); o.type=type||'sine'; o.frequency.value=f;
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(v,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t+dur+.05);
+  }
+  // سوت داور: سینوس بالا با ارتعاش سریع (نخود داخل سوت)
+  function whistle(dur,dl,f){
+    const a=ctx(); if(!a) return; const t=a.currentTime+(dl||0), fr=f||2950;
+    const o=a.createOscillator(), o2=a.createOscillator(), g=a.createGain();
+    const lf=a.createOscillator(), lg=a.createGain(), tr=a.createOscillator(), tg=a.createGain();
+    o.type='sine'; o2.type='triangle'; o.frequency.value=fr; o2.frequency.value=fr*2.01;
+    lf.frequency.value=31; lg.gain.value=95; lf.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(.34,t+.025); g.gain.setValueAtTime(.34,t+dur-.05); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    tr.frequency.value=22; tg.gain.value=.08; tr.connect(tg); tg.connect(g.gain);
+    const o2g=a.createGain(); o2g.gain.value=.3; o.connect(g); o2.connect(o2g); o2g.connect(g); g.connect(master);
+    [o,o2,lf,tr].forEach(n=>{ n.start(t); n.stop(t+dur+.05); });
+  }
+  const API={
+    on(){ return on; },
+    set(v){ on=!!v; if(!on) stopCrowd(); else if(run) startCrowd(); },
+    unlock(){ ctx(); },
+    crowd(){ startCrowd(); },
+    crowdOff(){ stopCrowd(); },
+    calm(){ level(.07,1.2); },
+    tense(){ level(.05,1.4); },
+    loud(){ level(.12,1); },
+    tick(hi){ tone(hi?1320:880,.22,.16,0,'square'); tone(hi?660:440,.12,.2,0,'sine'); },
+    start(){ whistle(.95,0); level(.13,.6); setTimeout(()=>level(.085,2.5),1200); },
+    half(){ whistle(.4,0); whistle(.4,.55); whistle(.95,1.1); level(.04,1.2); },
+    end(){ whistle(.4,0); whistle(.4,.55); whistle(1.1,1.1); },
+    short(){ whistle(.38,0); },
+    card(){ whistle(.5,0,2750); },
+    kick(){ tone(150,.5,.12,0,'sine'); burst('lowpass',900,200,.8,.25,.09); },
+    net(){ burst('highpass',2500,6500,.7,.22,.45); tone(95,.3,.25,0,'sine'); },
+    clank(){ [[1,1],[2.76,.6],[5.4,.35]].forEach(([r,m])=>tone(780*r,.28*m,.9/(r),0,'sine')); burst('highpass',3000,5000,.8,.12,.06); },
+    save(){ burst('bandpass',1800,900,1.2,.18,.18); tone(210,.25,.15,0,'sine'); },
+    gasp(){ burst('bandpass',500,1500,1.1,.2,.8); level(.11,.5); setTimeout(()=>level(.085,1.6),900); },
+    groan(){ burst('bandpass',900,380,1.1,.2,1.4); level(.06,.8); setTimeout(()=>level(.085,2),1500); },
+    cheer(big){
+      const v=big?.5:.3; level(big?.2:.14,.35);
+      burst('bandpass',500,1500,.9,v,2.6); burst('bandpass',900,2400,1.1,v*.7,2.2,.05); burst('highpass',1800,3200,.6,v*.35,2);
+      [392,494,587,784].forEach((f,i)=>tone(f,.06,1.4,i*.04,'sawtooth'));
+      setTimeout(()=>level(.09,3),1800);
+    },
+    boo(){ burst('lowpass',380,260,1.2,.28,1.8); },
+    drum(){ tone(70,.5,.22,0,'sine'); tone(60,.4,.25,.2,'sine'); },
+    fanfare(){
+      [[392,0],[523,.18],[659,.36],[784,.54],[1046,.9]].forEach(([f,d])=>{ tone(f,.12,.9,d,'sawtooth'); tone(f*1.5,.05,.9,d,'triangle'); });
+      burst('bandpass',600,2000,.8,.4,3); level(.14,.6);
+    }
+  };
+  return API;
+})();
+
+/* ================= بانک گزارش (همه‌چیز از روی کارت بازیکن‌ها ساخته می‌شود) ================= */
+/* سبک: لحظه‌به‌لحظه؛ هر خط یک لحظه‌ی بازیه و خط‌ها یکی‌یکی ظاهر می‌شن */
+const PN2=['روی کین','هری کین','تئو هرناندز','روبرتو کارلوس','جان تری'];
+const PNX={'مارک‌آندره تر اشتگن':'تر اشتگن','امیلیانو دیبو مارتینز':'مارتینز','ژاوی هرناندز':'ژاوی','علیسون بکر':'علیسون','وینیسیوس جونیور':'وینیسیوس'};
+function pn(p){ if(PNX[p.fa]) return PNX[p.fa]; if(PN2.includes(p.fa)) return p.fa; const w=p.fa.split(' '); return w[w.length-1]; }
+
+const ri=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const chance=p=>Math.random()<p;
+const oneOf=a=>a[Math.floor(Math.random()*a.length)];
+const shuf=a=>{ a=a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+function wpick(items,wf){
+  let tot=0; const ws=items.map(x=>{ const w=Math.max(0,wf(x)); tot+=w; return w; });
+  if(tot<=0) return items[ri(0,items.length-1)];
+  let r=Math.random()*tot; for(let i=0;i<items.length;i++){ r-=ws[i]; if(r<=0) return items[i]; } return items[items.length-1];
+}
+let USED=new Set();
+function say(pool){ const free=pool.filter(s=>!USED.has(s)); const src=free.length?free:pool; const s=oneOf(src); USED.add(s); return s; }
+const hasT=(p,k)=>!!p&&(p.im.includes(k)||p.ex.includes(k));
+let CX={};
+const F=s=>s.replace(/\{(\w+)\}/g,(m,k)=>CX[k]!=null?CX[k]:'');
+const SAY=pool=>F(say(pool));
+function tpick(p,bank){
+  const ex=p.ex.filter(k=>bank[k]), all=[...p.ex,...p.im].filter(k=>bank[k]);
+  if(!all.length) return 'gen';
+  if(ex.length&&chance(.68)) return oneOf(ex);
+  return oneOf(all);
+}
+const TB=(p,bank)=>SAY(bank[tpick(p,bank)]||bank.gen);
+const L=(...a)=>a.filter(Boolean).join('\n');
+
+/* ---------- حال‌وهوای دقیقه ---------- */
+const INTRO={
+ e1:["دقایق اول بازی… دو تیم هنوز با احتیاط بازی می‌کنن.","زمین هنوز گرم نشده، ولی بوی خطر میاد…","ورزشگاه پر از صداست؛ بازی تازه راه افتاده."],
+ m1:["بازی حسابی داغ شده…","وسط زمین جنگ تن‌به‌تنه!","ریتم بازی بالا رفته؛ هیچ‌کس عقب نمی‌کشه."],
+ l1:["آخرای نیمه‌ی اوله…","چند دقیقه تا رختکن مونده؛ همه دنبال یه گلن."],
+ e2:["نیمه‌ی دوم تازه شروع شده…","دو تیم با انرژی تازه برگشتن تو زمین."],
+ m2:["وسطای نیمه‌ی دوم… فشار داره بیشتر می‌شه.","ورزشگاه یک‌صدا فریاد می‌زنه!","وقت داره می‌گذره…"],
+ l2:["دقایق آخر بازی!","پاها خسته‌ست، ولی کسی کم نمیاره…","هر توپ می‌تونه آخرین توپ باشه!"],
+ et:["وقت اضافه… پاها سنگینه، دل‌ها پر از استرس.","نفس‌ها به شماره افتاده…","هر لحظه‌ی این وقت اضافه می‌تونه سرنوشت‌ساز باشه."]
+};
+const STATEP={
+ zero:["هنوز گلی زده نشده.","صفر صفر… کی اول دروازه رو باز می‌کنه؟"],
+ trail:["{T} عقبه و داره همه‌چی رو می‌ریزه جلو!","{T} دنبال جبرانه…"],
+ lead:["{T} جلوئه و با خیال راحت توپ رو می‌چرخونه.","{T} جلوئه، ولی هنوز گرسنه‌ی گل بعدیه."],
+ level:["بازی مساویه؛ یه گل همه‌چی رو عوض می‌کنه.","نتیجه مساویه… کی اول نفس حریفو می‌گیره؟"]
+};
+const COACHP={
+ press:["پرس سنگین شاگردای مربی {C}!","مربی {C} کنار خط داد می‌زنه: «برید جلو!»"],
+ cnt:["مربی {C} منتظر یه ضدحمله‌ست…"],
+ ctrl:["مالکیت با {T}؛ مربی {C} آروم کنار خط ایستاده."],
+ tact:["مربی {C} یه تغییر کوچیک تو چیدمان داده…"],
+ psy:["مربی {C} به بازیکناش علامت می‌ده: «آروم، تمرکز!»"]
+};
+const PARK=["دفاع بسته‌ی تیمِ مربی {CU} جای نفس کشیدن نمی‌ده.","{U} فشرده دفاع می‌کنه؛ جای خالی پیدا نمی‌شه."];
+
+const KICK={
+ h1:["سوت داور {R}… و بازی شروع شد!\nاز تیم {T}، {P} پا به توپ می‌شه…\nیه پاس کوتاه و توپ راه افتاد!",
+     "داور {R} سوت می‌زنه؛ بازی شروع شد!\nاز تیم {T}، {P} اولین ضربه رو می‌زنه…\nورزشگاه یکپارچه فریاده!"],
+ h2:["نیمه‌ی دوم شروع شد!\nاین بار از تیم {T}، {P} پا به توپ می‌شه…",
+     "سوت داور {R}… نیمه‌ی دوم!\nاز تیم {T}، {P} توپ رو به جریان می‌ندازه."],
+ e1:["وقت اضافه شروع شد!\nاز تیم {T}، {P} پا به توپ می‌شه…\nسی دقیقه‌ی سرنوشت‌ساز!",
+     "سوت داور {R}… وقت اضافه!\nاز تیم {T}، {P} توپ رو راه می‌ندازه."],
+ e2:["آخرین پونزده دقیقه!\nاز تیم {T}، {P} توپ رو راه می‌ندازه…\nبعد از این فقط پنالتیه.",
+     "نیمه‌ی دوم وقت اضافه!\nاز تیم {T}، {P} پا به توپ می‌شه…"]
+};
+
+/* ---------- جاها روی زمین (از روی پستِ بازیکن در ترکیب) ---------- */
+const ZAT={GK:'جلوی دروازه‌ی خودی',CB:'قلب دفاع',RB:'جناح راست، عقب زمین',LB:'جناح چپ، عقب زمین',CDM:'جلوی خط دفاع',CM:'وسط زمین',CAM:'جلوی محوطه‌ی جریمه',RM:'جناح راست',LM:'جناح چپ',CF:'لبه‌ی محوطه، پشت مهاجم',RW:'جناح راست',ST:'داخل محوطه',LW:'جناح چپ'};
+const ZBX={ST:'داخل محوطه، مقابل دروازه',CF:'لبه‌ی محوطه',RW:'کنار راست محوطه',LW:'کنار چپ محوطه',CAM:'جلوی محوطه',RM:'جناح راست، نزدیک محوطه',LM:'جناح چپ، نزدیک محوطه',CM:'بیرون محوطه',CDM:'بیرون محوطه'};
+const zat=p=>ZAT[p.c]||'وسط زمین';
+const zbx=p=>ZBX[p.c]||'داخل محوطه‌ی جریمه';
+
+/* ---------- زنجیره‌ی توپ: شروع ← حرکت ← پاس ← گیرنده ---------- */
+const START=["توپ پیش {Q}، {QZ}…","{Q} با توپ، {QZ}…","بازی از {QZ} شروع می‌شه؛ توپ دست {Q}…"];
+const GKSTART=["{Q} توپ رو از دروازه بیرون می‌ده…","توپ دست {Q}؛ بازی رو از عقب شروع می‌کنه…"];
+const SHORTP=["پاس به {TO}، {TOZ}!","توپ رو می‌ده به {TO}، {TOZ}…","پاس رو به جلو به {TO}، {TOZ}!"];
+const RECV=["{A} توپ رو می‌گیره…","توپ پیش {A}…","{A} با توپ…"];
+const RECVSOLO=["{B} توپ رو می‌گیره، {BZ}…","توپ پیش {B}، {BZ}…"];
+const ACT={
+ dribx:["یکی… دوتا… سه‌تا! همه رو جا گذاشت!","یه حرکت… یکی دیگه… مدافعا فقط نگاش می‌کنن!","توپ انگار به پاش چسبیده! یکی رو دور زد… دومی هم رد شد!"],
+ drib:["یه حرکت بدن… از مدافع اول رد شد!","بین دو مدافع… تغییر جهت… و رد شد!","توپ رو می‌کشه… یکی رو جا گذاشت!"],
+ burst:["دنده عوض می‌کنه! کسی بهش نمی‌رسه!","توپ رو جلو می‌ندازه و مثل برق می‌دوه!"],
+ spd:["با سرعت از کنار مدافع رد شد!","توپ رو جلو می‌ندازه و می‌دوه… مدافع جا موند!"],
+ ctrl:["آروم… صبور… توپ رو زیر نظر داره و ریتم رو نگه می‌داره."],
+ build:["با توپ جلو می‌یاد… یه نفر رو رد کرد!"],
+ engine:["بی‌وقفه می‌دوه و توپ رو جلو می‌بره!"],
+ power:["با بدن مدافع رو کنار می‌زنه… توپ هنوز پیششه!"],
+ lead:["داد می‌زنه: «بیاین جلو!» و خودش توپ رو می‌بره…"],
+ wing:["کنار خط بالا می‌یاد… از مدافع رد شد!","تو جناح بدون توقف می‌دوه… توپ رو داخل می‌کشه!"],
+ gen:["توپ رو جلو می‌بره…","یه نگاه به اطراف… دنبال راه نفوذه."]
+};
+const PASSB={
+ thru:["پاس نفوذی به {B}، {BZ}! از لای دفاع!","{A} یه نگاه… پاس نفوذی! به {B}، {BZ}!"],
+ key:["پاس کلیدی به {B}، {BZ}!","{A} فضا رو می‌بینه… پاس به {B}، {BZ}!"],
+ lpass:["پاس بلند به {B}، {BZ}! از بالای سر مدافعا!"],
+ ctrl:["آروم پاس به {B}، {BZ}…"],
+ gen:["پاس به {B}، {BZ}!","توپ رو می‌ده به {B}، {BZ}…"]
+};
+const BRECV=["{B} توپ رو می‌گیره…","{B} تنهاست!","توپ جلوی پای {B}…"];
+const RECOV={
+ icpt:["{A} پاس حریفو قطع کرد، {AZ}!","{A}… چه قطع توپی! {AZ}!"],
+ press:["{A} پرس می‌کنه و توپ رو می‌گیره، {AZ}!"],
+ cnt:["ضدحمله! {A} توپ رو برمی‌داره، {AZ}!"],
+ gen:["{A} توپ رو می‌گیره، {AZ}… ضدحمله!"]
+};
+const CROSSL={
+ crossx:["سانتر! چه سانتر دقیقی! درست رو سر {B}!"],
+ cross:["{A} سر بالا… سانتر به محوطه!","سانتر چرخان از {AZ}!"],
+ gen:["{A} سانتر می‌کنه به محوطه!"]
+};
+function deliver(ev,to,zf){
+  const Q=ev.Q, out=[];
+  CX.TO=to.nm; CX.TOZ=zf(to);
+  if(Q&&Q!==to){ out.push(F(say(Q.c==='GK'?GKSTART:START))); out.push(F(say(SHORTP))); }
+  return out;
+}
+function actionOf(ev){
+  const A=ev.A; const ks=[...A.ex,...A.im].filter(k=>ACT[k]);
+  const k=ks.length?(A.ex.filter(x=>ACT[x]).length&&chance(.65)?oneOf(A.ex.filter(x=>ACT[x])):oneOf(ks)):'gen';
+  return L(F(say(RECV)),F(say(ACT[k])));
+}
+function passAB(ev){
+  const A=ev.A, k=tpick(A,PASSB);
+  return F(say(PASSB[k]||PASSB.gen));
+}
+/* مسیر توپ تا شوت‌زن (یا تا بازیکنِ سازنده) */
+function chainToB(ev){
+  if(ev.A){
+    const l1=deliver(ev,ev.A,zat); if(!l1.length) l1.push('');
+    return [L(...l1,actionOf(ev)),L(passAB(ev),F(say(BRECV)))];
+  }
+  const l=deliver(ev,ev.B,zbx);
+  return [L(...l,F(say(l.length?BRECV:RECVSOLO)))];
+}
+function chainToA(ev){
+  const l1=deliver(ev,ev.A,zat);
+  return [L(...l1,actionOf(ev))];
+}
+const WRONGD="{D} که تو پست خودش نیست، دیر جنبید…";
+const LATED="{D} می‌خواد برسه… دیر شد!";
+
+/* ---------- لحظه‌ی گل ---------- */
+const FINISH={
+ finx:["یه نگاه به {K}…\nشوت!\nتوپ تو گوشه‌ی دروازه!","{B} حتی مکث نمی‌کنه…\nشوت!\n{K} تکون هم نخورد… توپ تو توره!"],
+ fin:["{B} یه نگاه به دروازه…\nشوت!\nتوپ گوشه‌ی دروازه رو پیدا کرد!","{B} خونسرد…\nضربه…\nو توپ از کنار دست {K} رفت تو!","{B} شوت می‌زنه…\n{K} شیرجه…\nنه! توپ تو دروازه‌ست!"],
+ behind:["{B} از پشت دفاع رد شد!\nفقط خودش و {K}…\nچیپ!… توپ از بالای سر {K} رفت تو!","{B} تک‌به‌تک با {K}…\nصبر می‌کنه… صبر…\nو توپو از زیر پاش رد کرد!"],
+ burst:["{B} مثل برق می‌رسه به توپ…\nقبل از مدافع… شوت!\nتوپ تو توره!"],
+ spd:["{B} می‌دوه… می‌رسه به توپ…\nشوت!\nتوپ رفت تو!"],
+ twof:["{B} توپ رو می‌ندازه رو پای ضعیفش…\nشوت!\nبرای اون فرقی نداره؛ توپ تو دروازه‌ست!"],
+ box:["{B} از پشت سر وارد محوطه می‌شه… کسی ندیدش!\nضربه!\nتوپ تو توره!"],
+ acro:["توپ تو هواست…\n{B} می‌چرخه… قیچی برگردون!\nتوپ رفت تو! باورنکردنیه!"],
+ gen:["{B}… شوت!\n{K} نمی‌رسه!\nتوپ تو دروازه!","{B} ضربه می‌زنه…\nتوپ رفت تو!"]
+};
+const HEADF={
+ headx:["{B} بالاتر از همه می‌پره…\nضربه‌ی سر!\nمثل موشک رفت تو!","کسی به هوای {B} نمی‌رسه…\nسر!\nتوپ تو دروازه!"],
+ hdset:["{B} از بین مدافعا جدا می‌شه…\nسر!\nتوپ گوشه‌ی دروازه رو پیدا کرد!"],
+ head:["{B} می‌پره…\nضربه‌ی سر!\nتوپ رفت تو!","{B} زودتر از مدافع…\nسر!\nگوشه‌ی دروازه!"],
+ air:["نبرد هوایی… {B} برنده‌ست!\nسر!\nتوپ تو توره!"],
+ power:["{B} مدافعو کنار می‌زنه…\nسر!\nتوپ رفت تو!"],
+ gen:["{B} به توپ می‌رسه…\nسر!\n{K} نمی‌رسه! توپ رفت تو!"]
+};
+const SOLO={
+ dribx:["{B} با توپ راه می‌افته… یکی… دوتا… از {D} هم رد شد!\nفقط {K} مونده…\nشوت! توپ تو توره!"],
+ drib:["{B} با توپ راه می‌افته… دریبل… یکی دیگه…\nروبه‌روی {K}… ضربه!\nتوپ رفت تو!"],
+ burst:["{B} دنده عوض کرد! کسی بهش نمی‌رسه… کسی!\nوارد محوطه شد… شوت!\nتوپ تو دروازه!"],
+ spd:["{B} توپ رو جلو می‌ندازه و می‌دوه…\nمدافعا پشت سرش جا موندن…\nضربه!\nتوپ تو توره!"],
+ power:["{B} با توپ می‌ره جلو…\nیکی رو با بدن کنار زد… یکی دیگه…\nشوت محکم!\nتوپ رفت تو!"],
+ gen:["{B} با توپ تنهایی می‌ره جلو…\nوارد محوطه شد…\nشوت!\nتوپ تو دروازه!"]
+};
+const LONGF={
+ lshx:["{B} بیرون محوطه… جا داره…\nشوت از راه دور!\nتوپ اوج می‌گیره… {K} می‌پره…\nگوشه‌ی بالای دروازه! چه ضربه‌ای!"],
+ lsh:["{B} از بیرون محوطه… شوت!\nتوپ مثل گلوله…\nرفت تو!","{B} یه نگاه… و از راه دور می‌کوبه!\n{K} نمی‌رسه!\nتوپ تو دروازه!"],
+ gen:["{B} از بیرون محوطه شانسشو امتحان می‌کنه…\nشوت!\nتوپ از زیر تیر افقی رفت تو!"]
+};
+const CORNERH={
+ hdset:["توپ میاد… {B} جدا می‌شه…\nسر!\nتوپ تو دروازه!"],
+ headx:["{B} بالاتر از همه!\nسر!\n{K} حتی تکون نخورد!"],
+ gen:["محوطه شلوغه… توپ دست‌به‌دست…\n{B}… سر!\nتوپ رفت تو!","{B} زودتر از همه می‌رسه…\nسر!\nتوپ تو توره!"]
+};
+
+/* ---------- واکنش بعد از گل ---------- */
+const GOALCRY=["گووووووول!","گل! گل! گل!","گووووول! چه گلی!","گووووول برای {T}!"];
+const AFTERG=["ورزشگاه منفجر شد!","{B} می‌دوه سمت سکوها… هم‌تیمیا می‌ریزن روش!","{B} رو زانو سُر می‌خوره… چه شادی‌ای!","{B} مشتشو گره کرده و فریاد می‌زنه!"];
+const AFTER_AST="{A} اولین نفریه که بغلش می‌کنه.";
+const AFTER_CON=["{K} با عصبانیت توپو از تور درمیاره.","نیمکت {U} ساکت شده.","مدافعای {U} ناباورانه به هم نگاه می‌کنن."];
+const AFTER_COA="مربی {C} کنار خط مشتشو گره کرده!";
+const AFTER_REG="مربی {CU} سریع بازیکناشو جمع می‌کنه: «برمی‌گردیم!»";
+const AFTER_GOLD="تغییر دقایق آخر مربی {C} جواب داد!";
+const AFTER_LATE="این گل، تو این دقایق… می‌تونه همه‌چی رو تموم کنه!";
+
+/* ---------- دروازه‌بان و دفاع ---------- */
+const SAVE={
+ reflx:["{K}… چه واکنشی!\nدستشو رسوند! توپ رفت کرنر!","همه گل رو دیده بودن…\nجز {K}! باورنکردنیه!"],
+ refl:["{K} با یه واکنش سریع…\nمهار کرد!"],
+ gsave:["{K} شیرجه می‌زنه رو زمین…\nبا دو دست دفع کرد!","{K} کنار تیرک دراز کشید…\nتوپ رو بیرون انداخت!"],
+ asave:["{K} پرواز می‌کنه…\nبا نوک انگشت! توپ از بالای تیر رفت بیرون!","{K} می‌پره…\nو توپ رو از گوشه‌ی بالا می‌گیره!"],
+ come:["{K} زود از دروازه بیرون اومد…\nزاویه رو بست؛ توپ خورد به بدنش!","{K} شجاعانه بیرون می‌زنه…\nقبل از مهاجم به توپ رسید!"],
+ sweep:["{K} مثل یه مدافع از محوطه بیرون اومد…\nتوپو دور کرد!"],
+ gen:["{K}… مهار کرد!","{K} توپو تو بغلش گرفت!"]
+};
+const BLOCKF={
+ blockx:["{D} خودشو جلوی توپ می‌ندازه!\nبلاک شد!","{D} انگار می‌دونست توپ کجا می‌ره…\nبلاک!"],
+ block:["{D} جلوی توپ…\nبلاک کرد!"],
+ tackx:["{D}… تکل!\nدرست لحظه‌ی شوت، توپو از پای {B} زد!"],
+ tack:["{D} با یه تکل تمیز…\nتوپ رو گرفت!"],
+ mark:["{D} مثل سایه چسبیده به {B}…\nشوت بلاک شد!"],
+ duel:["{D} تن‌به‌تن با {B}…\nبرد! توپ رو دور کرد!"],
+ gen:["{D} پاشو می‌ذاره جلوی توپ!","{D} آخرین لحظه…\nبلاک!"]
+};
+
+/* ---------- پاراگراف اول: حال‌وهوا ---------- */
+function introText(ev,X,Y,S){
+  const m=ev.min; let ph;
+  if(ev.et) ph='et'; else if(ev.half===1) ph=m<=14?'e1':m>=37?'l1':'m1'; else ph=m<=56?'e2':m>=80?'l2':'m2';
+  const sc=ev.pre, a=sc[ev.t], b=sc[1-ev.t];
+  const st=(a===0&&b===0)?'zero':a>b?'lead':a<b?'trail':'level';
+  const out=[];
+  if(!ev.kick&&chance(.72)) out.push(say(INTRO[ph]));
+  const r=Math.random();
+  if(r<.42) out.push(F(say(STATEP[st])));
+  else if(r<.72){ const ks=X.co.im.concat(X.co.ex).filter(k=>COACHP[k]); if(ks.length) out.push(F(say(COACHP[oneOf(ks)]))); }
+  if(!out.length&&!ev.kick) out.push(say(INTRO[ph]));
+  return out.join('\n');
+}
+function afterGoal(ev,X,Y,S){
+  const out=[F(say(GOALCRY)),SAY(AFTERG)];
+  if(ev.A&&!['solo','long','pen','fk'].includes(ev.gt)&&chance(.5)) out.push(F(AFTER_AST));
+  else if(chance(.6)) out.push(SAY(AFTER_CON));
+  if(Y.co.ex.includes('regroup')&&chance(.8)) out.push(F(AFTER_REG));
+  else if(chance(.25)) out.push(F(AFTER_COA));
+  if(ev.min>=70&&X.co.ex.includes('goldsub')) out.push(F(AFTER_GOLD));
+  else if(ev.min>=80&&chance(.5)) out.push(F(AFTER_LATE));
+  return out.join('\n');
+}
+
+/* ---------- نویسنده‌ی اصلی ---------- */
+function writeEvent(ev,X,Y,S){
+  CX={Q:ev.Q?ev.Q.nm:'',QZ:ev.Q?zat(ev.Q):'',AZ:ev.A?zat(ev.A):'',BZ:ev.B?zbx(ev.B):'',T:X.name,U:Y.name,A:ev.A?ev.A.nm:'',B:ev.B?ev.B.nm:'',D:ev.D?ev.D.nm:'',K:Y.gk.nm,KA:X.gk.nm,S:ev.S?ev.S.nm:'',C:X.cn,CU:Y.cn,R:S.refNm,m:fa(ev.min)};
+  const W=WRITERS[ev.type]||WRITERS.save;
+  const beats=W(ev,X,Y,S);
+  if(ev.kick){ CX.P=ev.kick.nm; CX.T=ev.kick.team; beats.unshift(SAY(KICK[ev.kick.key])); CX.T=X.name; }
+  return beats.filter(Boolean);
+}
+const kb=(ev,X,Y,S)=>introText(ev,X,Y,S);
+const REFL={
+ off:{strict:'داور {R} قاطع دستشو بالا می‌بره…',mid:'داور {R} با کمک‌داور صحبت می‌کنه…',pen:'داور {R} منتظر نظر VAR می‌مونه…',lax:'داور {R} اول گذاشت بازی ادامه پیدا کنه… حالا می‌ره سمت کمک‌داور…'},
+ yel:{strict:'داور {R} حتی یه لحظه مکث نمی‌کنه…',mid:'سوت داور {R}؛ {D} رو صدا می‌کنه…',pen:'داور {R} سوت می‌زنه و میاد سمت {D}…',lax:'داور {R} که کم سوت می‌زنه، این بار کوتاه نمیاد…'},
+ pno:{strict:'داور {R} سرشو تکون می‌ده: «ادامه بدین!»',mid:'داور {R} یه لحظه مکث می‌کنه… سوت نمی‌زنه.',pen:'داور {R} این بار سوت نمی‌زنه…',lax:'داور {R} با دست اشاره می‌کنه: «ادامه!»'},
+ pen:{strict:'سوت داور {R}! بی‌معطلی… نقطه‌ی پنالتی!',mid:'داور {R} یه لحظه مکث… نگاه به VAR…\nپنالتی!',pen:'سوت داور {R} فوری میاد…\nپنالتی!',lax:'داور {R} اول بازی رو ادامه می‌ده…\nولی VAR صداش می‌کنه… پنالتی!'}
+};
+const WRITERS={
+ /* ===== گل‌ها ===== */
+ goal(ev,X,Y,S){
+  const g=ev.gt, A=ev.A, B=ev.B, K=kb(ev,X,Y,S); let mid=[];
+  if(g==='open'){
+    const dl=ev.D&&ev.D.wrong&&chance(.8)?F(WRONGD):ev.D&&chance(.4)?F(LATED):'';
+    mid=[...chainToB(ev),L(dl,TB(B,FINISH))];
+  } else if(g==='cross'){
+    const l1=deliver(ev,A,zat), ck=A.ex.includes('crossx')?'crossx':A.im.includes('cross')?'cross':'gen';
+    mid=[L(...l1,F(say(RECV)),F(say(ACT.wing))),F(say(CROSSL[ck])),L(F('توپ تو هواست… {B} داخل محوطه…'),TB(B,HEADF))];
+  } else if(g==='solo'){
+    CX.BZ=zat(B);
+    const l=deliver(ev,B,zat);
+    mid=[L(...l,l.length?'':F(say(RECVSOLO))),TB(B,SOLO)];
+  } else if(g==='long'){
+    CX.BZ='بیرون محوطه'; mid=[...chainToB(ev),L(F('{B} لحظه‌ای مکث نمی‌کنه…'),TB(B,LONGF))];
+  } else if(g==='counter'){
+    const rk=A.ex.includes('icpt')?'icpt':A.im.includes('press')?'press':A.im.includes('cnt')?'cnt':'gen';
+    mid=[F(say(RECOV[rk])),L(passAB(ev),F('{B} از پشت دفاع بیرون زد!')),TB(B,FINISH)];
+  } else if(g==='corner'){
+    mid=[F('کرنر برای {T}.\n{S} پشت توپ… محوطه پر از بازیکنه…\nسانتر!'),TB(B,CORNERH)];
+  } else if(g==='fk'){
+    mid=[...chainToA(ev),L(F('{D} از پشت… خطا! {A} افتاد.'),F('بیست‌وپنج متری دروازه… {S} پشت توپ…'),hasT(ev.S,'fkx')?F('همه می‌دونن {S} از این‌جا چی‌کار می‌کنه…'):'',F('دیوار {U} آماده‌ست…')),
+         F('{S} می‌دوه… ضربه!\nتوپ از بالای دیوار پیچ می‌خوره… {K} می‌پره…\nگوشه‌ی دروازه!')];
+  } else {
+    mid=[...chainToA(ev),penScene(ev,X,Y,S),penKick(ev,X,Y,S,'goal')];
+  }
+  return [K,...mid,afterGoal(ev,X,Y,S)];
+ },
+ /* ===== گل مردود ===== */
+ offside(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToB(ev),
+   F('{B}… شوت!\nتوپ تو دروازه! ورزشگاه منفجر شد…\nصبر کنین! پرچم کمک‌داور بالاست!'),
+   L(F(REFL.off[S.refTr]),'آفساید! گل مردوده!',F(say(["{B} سرشو گرفته… باورش نمی‌شه.","{K} نفس راحتی می‌کشه."])))];
+ },
+ varno(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToB(ev),
+   F('{B}… شوت! توپ تو دروازه!\nبازیکنای {T} دارن خوشحالی می‌کنن…\nولی داور {R} دستشو گذاشته رو گوشش… VAR!'),
+   F('خطا روی {D} اول حمله…\nگل قبول نیست!\n{T} اعتراض می‌کنه، ولی تصمیم قطعیه.')];
+ },
+ /* ===== موقعیت‌های بدون گل ===== */
+ save(ev,X,Y,S){
+  const sh=hasT(ev.B,'lsh')?'{B} از راه دور… شوت!':hasT(ev.B,'head')?'{B}… ضربه‌ی سر!':hasT(ev.B,'behind')?'{B} تک‌به‌تک… شوت!':'{B} یه نگاه به دروازه… شوت!';
+  const pk=Y.co.im.includes('park')&&chance(.4)?F(say(PARK)):'';
+  return [kb(ev,X,Y,S),...chainToB(ev),L(F(sh),'توپ داره می‌ره تو…',TB(Y.gk,SAVE)),
+   L(F(say(["ورزشگاه از هیجان می‌لرزه!","{B} دستاشو گذاشته رو سرش…","هم‌تیمیا میان سمت {K} و تشویقش می‌کنن."])),pk)];
+ },
+ post(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToB(ev),
+   L(F('{B} یه نگاه… شوت!'),F('{K} فقط نگاه می‌کنه…'),chance(.5)?'تیر افقی!!':'تیرک!!','توپ برگشت تو زمین!'),
+   F(say(["{D} سریع توپو دور می‌کنه.","{B} باورش نمی‌شه… دستاشو گذاشته رو کمرش.","{K} یه نفس عمیق می‌کشه؛ شانس آورد."]))];
+ },
+ block(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToB(ev),L(F('{B} تو محوطه… ضربه!'),TB(ev.D,BLOCKF),chance(.5)?'توپ رفت کرنر.':'توپ رفت بیرون.'),
+   Y.co.im.includes('park')&&chance(.5)?F(say(PARK)):''];
+ },
+ duel(ev,X,Y,S){
+  const gkW=!hasT(ev.D,'mark')&&!hasT(ev.D,'duel')&&hasT(Y.gk,'come');
+  const b3=gkW?F('{B} تنها با {K}!\n{K} بیرون میاد… زاویه رو بسته…\nتوپ رو از پای {B} گرفت!')
+   :hasT(ev.D,'duel')?F('{B} از دفاع رد شد… فقط {D} مونده!\n{D} صبر می‌کنه… صبر…\nتکل! توپ رو گرفت!')
+   :F('{B} داره می‌ره… {D} از پشت می‌رسه…\nآخرین تکل! نجات داد!');
+  return [kb(ev,X,Y,S),...chainToB(ev),b3,F('{T} یه موقعیت بزرگ رو از دست داد.')];
+ },
+ corner(ev,X,Y,S){
+  const hd=hasT(ev.B,'head')||hasT(ev.B,'headx')||hasT(ev.B,'hdset');
+  return [kb(ev,X,Y,S),F('کرنر برای {T}.\n{S} پشت توپ… سانتر!'),
+   hd?F('{B} بالاتر از همه… سر!\nکنار تیرک!\nیه کم دقیق‌تر بود، گل بود!'):F('{D} بالاتر از همه می‌پره…\nدفع کرد!')];
+ },
+ fkmiss(ev,X,Y,S){
+  const o=oneOf(['بالای دیوار… بالای دروازه!\nیه کم بلند بود.','پیچ می‌خوره… {K} می‌پره…\nکرنر!','خورد به دیوار!']);
+  return [kb(ev,X,Y,S),...chainToA(ev),L(F('{D} از پشت… خطا! {A} افتاد، نزدیک محوطه.'),F('{S} پشت توپ… دیوار {U} آماده‌ست…'),hasT(ev.S,'fkx')||hasT(ev.S,'fk')?F('همه چشم دوختن به {S}…'):''),
+   L(F('{S} می‌دوه… ضربه!'),F(o))];
+ },
+ yellow(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToA(ev),
+   L(F('{A} داره می‌ره…'),F('{D} از پشت… خطا! {A} افتاد رو زمین.'),F(REFL.yel[S.refTr]),F('کارت زرد برای {D}!')),
+   F('{D} اعتراض می‌کنه… فایده نداره.')];
+ },
+ red(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToA(ev),
+   F('{A} تنها با دروازه…\n{D} از پشت انداختش!\nسوت داور {R}… دست می‌ره تو جیبش…\nکارت قرمز!!'),
+   F('{D} با سر پایین از زمین بیرون می‌ره…\n{U} ده‌نفره شد!')];
+ },
+ injury(ev,X,Y,S){
+  return [kb(ev,X,Y,S),F('یهو بازی متوقف شد…\n{B} از تیم {T} افتاده رو زمین؛ پاشو گرفته…'),
+   'کادر پزشکی می‌دوه تو زمین…\nورزشگاه ساکته…',
+   F('{B} بلند شد! چند قدم… می‌تونه ادامه بده.\nسکوها براش دست می‌زنن.')];
+ },
+ penmiss(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToA(ev),penScene(ev,X,Y,S),penKick(ev,X,Y,S,ev.res),
+   ev.res==='save'?F('هم‌تیمیا {K} رو رو دست بلند کردن!'):F('{B} دستاشو گذاشته رو صورتش…')];
+ },
+ penno(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToA(ev),
+   L(F('{A} تو محوطه با {D} درگیر می‌شه… افتاد!'),F('بازیکنای {T} داد می‌زنن: «پنالتی!»'),F(REFL.pno[S.refTr]),'VAR نگاه می‌کنه… نه! پنالتی نیست.'),
+   F('{T} ناباورانه به داور نگاه می‌کنه.')];
+ },
+ clear(ev,X,Y,S){
+  return [kb(ev,X,Y,S),...chainToB(ev),
+   F('{B}… شوت!\n{K} شکست خورد… توپ داره می‌ره تو…\n{D}!!! روی خط دروازه بیرونش کشید!'),
+   F('باورنکردنیه! {D} یه گل قطعی رو گرفت.')];
+ },
+ counter(ev,X,Y,S){
+  const rk=ev.A.ex.includes('icpt')?'icpt':ev.A.im.includes('press')?'press':ev.A.im.includes('cnt')?'cnt':'gen';
+  return [kb(ev,X,Y,S),F(say(RECOV[rk])),L(passAB(ev),F('{B} می‌دوه… سه به دو!')),
+   F('{D} پاس آخر رو قطع کرد!'),'ضدحمله بی‌نتیجه موند.'];
+ },
+ miss(ev,X,Y,S){
+  const o=oneOf(['شوت… بالای دروازه!!','ضربه… کنار تیرک! بیرون!','زد… و از کنار دروازه بیرون رفت!']);
+  return [kb(ev,X,Y,S),...chainToB(ev),L(F('{B}، بهترین موقعیت بازی…'),'فقط باید بزنه…',o),
+   F('{B} دستاشو گذاشته رو صورتش…\n{K} نفس راحتی می‌کشه.')];
+ }
+};
+function penScene(ev,X,Y,S){
+  const foul=ev.foulKind==='hand'?'سانتر به محوطه…\nتوپ خورد به دست {D}!':'{A} با توپ وارد محوطه…\n{D} از پشت… {A} افتاد!';
+  return L(F(foul),F(REFL.pen[S.refTr]),F('{D} ناباورانه دستاشو باز کرده.'));
+}
+function penKick(ev,X,Y,S,res){
+  const P=ev.S||ev.B, K=Y.gk; CX.P=P.nm;
+  const pre=L(F('{P} پشت توپ…'),hasT(P,'penx')?'اون پنالتی‌زن قهاریه…':'',hasT(K,'pensv')?F('روبه‌روش {K}، که پنالتی‌گیره…'):F('{K} رو خط دروازه منتظره…'),'می‌دوه…');
+  let o;
+  if(res==='goal') o=oneOf(['ضربه… گوشه‌ی راست! {K} اشتباه رفت!\nتوپ تو دروازه!','می‌کوبه گوشه‌ی بالا…\n{K} نمی‌رسه!','وسط دروازه!\n{K} از قبل پریده بود!']);
+  else if(res==='save') o=oneOf(['ضربه… {K} درست حدس زد!!\nمهار کرد!','شوت محکم…\n{K} با دست دفعش کرد!!']);
+  else o=oneOf(['شوت… بالای دروازه!!','ضربه… تیرک!!\nبیرون اومد!']);
+  return L(pre,F(o));
+}
+
+/* ================= موتور بازی: تیم‌ها، برنامه‌ی دقیقه‌ها، پنالتی ================= */
+const GRP=c=>c==='GK'?'gk':['CB','RB','LB'].includes(c)?'def':['CDM','CM','CAM','RM','LM'].includes(c)?'mid':'fwd';
+function buildMT(){
+  return [0,1].map(t=>{
+    const players=D.slots[t].map((s,i)=>{
+      const pk=D.pick[t][i], p=PL[pk.pid];
+      return {sid:i,c:s.c,g:GRP(s.c),p,wrong:pk.wrong,ov:p.ov-(pk.wrong?8:0),im:p.im||[],ex:p.ex||[],nm:pn(p),yc:0,red:false,goals:0,ast:0,sv:0,rate:0};
+    });
+    const co=COACHES[D.coach[t]];
+    const avg=(players.reduce((a,x)=>a+x.ov,0)+co.ov)/12;
+    return {t,name:tname(t),form:G.teams[t].form,players,gk:players.find(x=>x.c==='GK'),co:Object.assign({},co,{im:co.im||[],ex:co.ex||[]}),cn:pn(co),avg,
+      pen:players[D.pen[t]],set:players[D.set[t]]};
+  });
+}
+function oddsFor(T){
+  const gap=Math.abs(T[0].avg-T[1].avg), strong=T[0].avg>=T[1].avg?0:1;
+  return {gap,strong,ps:gap>=5?.7:gap>=4?.6:.5};
+}
+const W_SHOT={ST:10,CF:7.5,RW:7,LW:7,CAM:5,RM:4,LM:4,CM:2.5,CDM:1.1,RB:1,LB:1,CB:.6,GK:0};
+const W_HEAD={ST:8,CF:5,RW:3,LW:3,CAM:2,RM:1.5,LM:1.5,CM:2,CDM:2,RB:1,LB:1,CB:6,GK:0};
+const W_LONG={ST:3,CF:4,RW:3,LW:3,CAM:7,RM:5,LM:5,CM:7,CDM:5,RB:1.5,LB:1.5,CB:.5,GK:0};
+const W_CRE={CAM:8,CM:6,RM:7,LM:7,RW:6,LW:6,CF:7,CDM:3,RB:3.5,LB:3.5,ST:3,CB:1,GK:.3};
+const W_DEF={CB:8,RB:5,LB:5,CDM:4,CM:1.5,CAM:.5,RM:1,LM:1,CF:.2,ST:.2,RW:.2,LW:.2,GK:0};
+const live=X=>X.players.filter(p=>!p.red);
+function pShooter(X,kind,ex){
+  const W=kind==='head'?W_HEAD:kind==='long'?W_LONG:W_SHOT;
+  return wpick(live(X).filter(p=>p!==ex&&p.c!=='GK'),p=>{
+    let w=(W[p.c]||0)*Math.pow(p.ov/90,6);
+    if(kind==='head'){ if(hasT(p,'head'))w*=2; if(hasT(p,'air'))w*=1.7; if(hasT(p,'headx'))w*=2.2; if(hasT(p,'hdset'))w*=2; }
+    else if(kind==='long'){ if(hasT(p,'lsh'))w*=2.2; if(hasT(p,'lshx'))w*=2; }
+    else if(kind==='solo'){ if(hasT(p,'dribx'))w*=2; if(hasT(p,'burst'))w*=2; if(hasT(p,'spd'))w*=1.5; if(hasT(p,'drib'))w*=1.5; }
+    else { if(hasT(p,'fin'))w*=1.7; if(hasT(p,'finx'))w*=1.6; if(hasT(p,'behind'))w*=1.2; if(hasT(p,'drib'))w*=1.1; if(kind==='fast'){ if(hasT(p,'behind'))w*=1.8; if(hasT(p,'spd'))w*=1.5; if(hasT(p,'burst'))w*=1.5; } }
+    return w;
+  });
+}
+function pCreator(X,ex,kind){
+  return wpick(live(X).filter(p=>p!==ex),p=>{
+    let w=(W_CRE[p.c]||1)*Math.pow(p.ov/90,6);
+    if(hasT(p,'key'))w*=1.5; if(hasT(p,'thru'))w*=1.5; if(hasT(p,'drib'))w*=1.2;
+    if(kind==='cross'){ if(hasT(p,'cross'))w*=2.5; if(hasT(p,'crossx'))w*=1.8; if(hasT(p,'wing'))w*=1.8; if(['RM','LM','RB','LB','RW','LW'].includes(p.c))w*=1.8; }
+    if(kind==='counter'){ if(hasT(p,'icpt'))w*=2; if(hasT(p,'press'))w*=1.6; if(hasT(p,'cnt'))w*=1.4; }
+    return w;
+  });
+}
+function pStarter(X,ex){
+  const W={CB:4,CDM:4,CM:4,RB:3,LB:3,CAM:1.5,GK:1.5,RM:1,LM:1};
+  const c=live(X).filter(p=>!ex.includes(p)&&W[p.c]);
+  return c.length?wpick(c,p=>W[p.c]):null;
+}
+function pDefender(Y,opts){
+  opts=opts||{};
+  return wpick(live(Y).filter(p=>p.c!=='GK'&&!(opts.noYc&&p.yc>0)),p=>{
+    let w=(W_DEF[p.c]||.3); if(p.wrong) w*=2.2; if(opts.hand&&p.g==='def') w*=1.2;
+    return w;
+  });
+}
+const taker=(X,key)=>{ const p=X[key]; if(p&&!p.red) return p; return live(X).filter(q=>q.c!=='GK').sort((a,b)=>b.ov-a.ov)[0]; };
+
+/* ---------- انتخاب نوع گل و نوع صحنه ---------- */
+function pickGoalType(X,S){
+  const w={open:28,cross:15,solo:11,long:10,counter:10,corner:9,fk:8,pen:S.refTr==='pen'?20:S.refTr==='strict'?8:S.refTr==='lax'?3:6};
+  if(hasT(X.co,'cnt')) w.counter+=8;
+  if(X.players.some(p=>hasT(p,'lsh')||hasT(p,'lshx'))) w.long+=4;
+  const st=X.set;
+  if(st&&(hasT(st,'fkx')||hasT(st,'fk'))) w.fk+=6;
+  if(X.players.some(p=>hasT(p,'headx')||hasT(p,'hdset'))){ w.corner+=5; w.cross+=4; }
+  if(X.players.some(p=>hasT(p,'dribx')||hasT(p,'burst'))) w.solo+=6;
+  const caps={pen:2,fk:2,corner:2,long:2};
+  const ks=Object.keys(w).filter(k=>!(caps[k]&&(S.cnt['g_'+k]||0)>=caps[k]));
+  return wpick(ks,k=>w[k]/(1+(S.cnt['g_'+k]||0)*.9));
+}
+const EVBASE={save:22,post:8,block:8,duel:8,offside:9,varno:2.5,corner:9,fkmiss:8,yellow:10,red:1.3,injury:3,penmiss:3.5,penno:3,clear:5,counter:5,miss:7};
+const EVCAP={red:1,injury:1,penmiss:1,penno:1,offside:2,varno:1,yellow:3,post:2,clear:1,fkmiss:2,corner:3};
+function pickType(S){
+  const R=S.refTr, m={
+    strict:{yellow:2.2,red:2.2,penmiss:1,penno:.8},mid:{},pen:{yellow:1,red:.4,penmiss:3,penno:.3},lax:{yellow:.4,red:0,penmiss:.5,penno:2.2}
+  }[R]||{};
+  const cap=Object.assign({},EVCAP); if(R==='strict') cap.yellow=4;
+  const ks=Object.keys(EVBASE).filter(k=>!(cap[k]&&(S.cnt['e_'+k]||0)>=cap[k])&&k!==S.lastType&&!(k==='red'&&R==='lax'));
+  return wpick(ks,k=>EVBASE[k]*(m[k]!=null?m[k]:1)/(1+(S.cnt['e_'+k]||0)*.4));
+}
+
+/* ---------- ساخت یک صحنه ---------- */
+function makeEvent(S,half,min,goal,et,kick){
+  const T=S.T;
+  let t, type, gt=null;
+  if(goal){ t=goal.t; type='goal'; gt=pickGoalType(T[t],S); S.cnt['g_'+gt]=(S.cnt['g_'+gt]||0)+1; }
+  else {
+    let p0=.5+(T[0].avg-T[1].avg)*.012; p0=Math.max(.38,Math.min(.62,p0));
+    t=chance(p0)?0:1;
+    if(S.regroup!=null&&chance(.7)){ t=S.regroup; }
+    S.regroup=null;
+    type=pickType(S); S.cnt['e_'+type]=(S.cnt['e_'+type]||0)+1;
+  }
+  // برای کارت/خطا، تیم مهاجم همان قربانی است؛ مدافع از تیم مقابل
+  const X=T[t], Y=T[1-t];
+  const ev={type,min,half,et:!!et,t,gt,A:null,B:null,D:null,S:null,Q:null,kick:kick||null,pre:S.score.slice()};
+  const withCre=chance(.85);
+  switch(type){
+    case 'goal':
+      if(gt==='open'){ ev.B=pShooter(X,'fin'); ev.A=pCreator(X,ev.B); ev.D=pDefender(Y); }
+      else if(gt==='cross'){ ev.B=pShooter(X,'head'); ev.A=pCreator(X,ev.B,'cross'); ev.D=pDefender(Y); }
+      else if(gt==='solo'){ ev.B=pShooter(X,'solo'); ev.D=pDefender(Y); }
+      else if(gt==='long'){ ev.B=pShooter(X,'long'); ev.A=chance(.7)?pCreator(X,ev.B):null; ev.D=pDefender(Y); }
+      else if(gt==='counter'){ ev.B=pShooter(X,'fast'); ev.A=pCreator(X,ev.B,'counter'); ev.D=pDefender(Y); }
+      else if(gt==='corner'){ ev.S=taker(X,'set'); ev.A=ev.S; ev.B=pShooter(X,'head',ev.S); ev.D=pDefender(Y); }
+      else if(gt==='fk'){ ev.S=taker(X,'set'); ev.B=ev.S; ev.A=pCreator(X,ev.S); ev.D=pDefender(Y); }
+      else { ev.S=taker(X,'pen'); ev.B=ev.S; ev.A=pCreator(X,ev.S); ev.D=pDefender(Y,{hand:1}); ev.foulKind=chance(.25)?'hand':'foul'; }
+      break;
+    case 'corner': ev.S=taker(X,'set'); ev.A=ev.S; ev.B=pShooter(X,'head',ev.S); ev.D=pDefender(Y); break;
+    case 'fkmiss': ev.S=taker(X,'set'); ev.A=pCreator(X,ev.S); ev.B=ev.S; ev.D=pDefender(Y); break;
+    case 'penmiss': ev.S=taker(X,'pen'); ev.B=ev.S; ev.A=pCreator(X,ev.S); ev.D=pDefender(Y,{hand:1}); ev.foulKind=chance(.25)?'hand':'foul';
+      ev.res=chance(hasT(Y.gk,'pensv')?.8:.55)?'save':'miss'; break;
+    case 'penno': ev.A=pCreator(X); ev.D=pDefender(Y); ev.B=ev.A; break;
+    case 'yellow': ev.A=pCreator(X); ev.D=pDefender(Y,{noYc:1}); ev.B=ev.A; ev.D.yc++; S.cards[1-t]++; break;
+    case 'red': ev.A=pCreator(X); ev.D=pDefender(Y,{noYc:0}); ev.B=ev.A; ev.D.red=true; S.cards[1-t]+=2; S.reds=(S.reds||0)+1; break;
+    case 'injury': ev.B=wpick(live(X).filter(p=>p.c!=='GK'),p=>1); break;
+    case 'duel': ev.B=pShooter(X,'fast'); ev.A=withCre?pCreator(X,ev.B):null; ev.D=pDefender(Y); break;
+    default: // save post block offside varno clear counter miss
+      ev.B=pShooter(X,type==='counter'?'fast':'fin'); ev.A=withCre?pCreator(X,ev.B,type==='counter'?'counter':null):null; ev.D=pDefender(Y);
+  }
+  if(type!=='corner'&&type!=='injury'&&!(type==='goal'&&gt==='corner')&&!(type==='goal'&&gt==='solo'&&false)&&(ev.A||ev.B)&&type!=='counter'&&!(type==='goal'&&gt==='counter')&&chance(.85)) ev.Q=pStarter(X,[ev.A,ev.B,ev.S]);
+  if((type==='counter'||type==='yellow'||type==='red'||type==='penno')&&!ev.A) ev.A=pCreator(X,ev.B);
+  if(type==='counter'&&!ev.B) ev.B=pShooter(X,'fast');
+  // آمار
+  if(['goal','save','post','block','miss','duel','clear','offside','fkmiss'].includes(type)) S.sh[t]++;
+  if(['goal','save','post','clear'].includes(type)) S.on[t]++;
+  if(type==='corner'||(type==='save'&&chance(.4))) S.cor[t]++;
+  if(type==='goal'){
+    ev.B.goals++; ev.B.rate+=3; if(ev.A&&ev.A!==ev.B){ ev.A.ast++; ev.A.rate+=2; }
+    S.score[t]++; Y.gk.rate-=.5;
+    if(Y.co.ex.includes('regroup')) S.regroup=1-t;
+  } else {
+    if(type==='save'){ Y.gk.sv++; Y.gk.rate+=1.5; }
+    if(type==='penmiss'&&ev.res==='save'){ Y.gk.sv++; Y.gk.rate+=2.5; }
+    if(type==='block'||type==='clear'||type==='duel') ev.D.rate+=1;
+    if(type==='post') ev.B.rate+=.5;
+    if(type==='clear') { S.sh[t]+=0; }
+  }
+  S.lastType=type;
+  ev.score=S.score.slice();
+  ev.paras=writeEvent(ev,X,Y,S);
+  ev.tn=X.name; ev.t=t;
+  return ev;
+}
+
+/* ---------- زمان‌بندی یک نیمه ---------- */
+function slotMinutes(n,lo,hi){
+  const out=[], span=(hi-lo+1)/n;
+  for(let i=0;i<n;i++){
+    const a=Math.round(lo+i*span), b=Math.round(lo+(i+1)*span-1);
+    out.push(ri(Math.min(a+1,b),Math.max(a+1,b-1)));
+  }
+  return out;
+}
+function genHalf(S,half,lo,hi,goals,nr,et,kick){
+  const n=Math.max(goals.length,ri(nr[0],nr[1])), mins=slotMinutes(n,lo,hi);
+  const gset=new Set(shuf([...Array(n).keys()]).slice(0,goals.length)), gl=shuf(goals);
+  let gi=0; const evs=[];
+  mins.forEach((m,i)=>{
+    const ev=makeEvent(S,half,m,gset.has(i)?gl[gi++]:null,et,i===0?kick:null);
+    evs.push(ev);
+  });
+  return evs;
+}
+const kickPlayer=X=>(X.players.find(p=>p.c==='ST')||X.players.find(p=>p.c==='CF')||X.players.find(p=>p.c==='CAM')||X.players.find(p=>p.c==='CM')||X.players[10]);
+
+/* ---------- برنامه‌ی کل بازی ---------- */
+function planMatch(){
+  USED=new Set();
+  const T=buildMT(), od=oddsFor(T), ref=REFS[D.ref];
+  const S={T,od,refTr:ref.tr,refNm:pn(ref),score:[0,0],cnt:{},sh:[0,0],on:[0,0],cor:[0,0],cards:[0,0],regroup:null,lastType:null};
+  // نتیجه‌ی ۹۰ دقیقه
+  let w; if(chance(.22)) w=-1; else w=chance(od.ps)?od.strong:1-od.strong;
+  let g=[0,0];
+  if(w<0){ const k=wpick([0,1,2,3],x=>[.15,.46,.31,.08][x]); g=[k,k]; }
+  else {
+    const a=wpick([1,2,3,4],x=>[.34,.4,.19,.07][x-1]);
+    const b=wpick([...Array(a).keys()],x=>[.5,.38,.12,.05][x]);
+    g[w]=a; g[1-w]=b;
+  }
+  const goals=[{t:0,n:g[0]},{t:1,n:g[1]}].flatMap(o=>Array.from({length:o.n},()=>({t:o.t})));
+  const h1=[],h2=[];
+  shuf(goals).forEach(x=>{
+    const c1=h1.length>=4, c2=h2.length>=4;
+    (c1?false:c2?true:chance(.44))?h1.push(x):h2.push(x);
+  });
+  const coinW=G.coin?G.coin.winner:0;
+  const P=t=>({nm:kickPlayer(T[t]).nm,team:T[t].name});
+  const segs=[];
+  const e1=genHalf(S,1,2,44,h1,[4,6],false,Object.assign({key:'h1'},P(coinW)));
+  segs.push({key:'h1',evs:e1,from:0,to:45,label:'نیمه‌ی اول',per:'نیمه اول'});
+  const e2=genHalf(S,2,46,89,h2,[4,6],false,Object.assign({key:'h2'},P(1-coinW)));
+  segs.push({key:'h2',evs:e2,from:45,to:90,label:'نیمه‌ی دوم',per:'نیمه دوم'});
+  const pStr=od.ps;
+  if(w<0){
+    const r=Math.random(); let a1=[],a2=[];
+    const win=chance(od.ps)?od.strong:1-od.strong;
+    if(r<.35){ (chance(.5)?a1:a2).push({t:win}); }
+    else if(r<.5){ const f=chance(.5)?0:1; a1.push({t:f}); a2.push({t:1-f}); }
+    const k0=chance(.5)?0:1;
+    const x1=genHalf(S,3,92,104,a1,[2,3],true,Object.assign({key:'e1'},P(k0)));
+    segs.push({key:'e1',evs:x1,from:90,to:105,label:'نیمه‌ی اول وقت اضافه',per:'وقت اضافه ۱'});
+    const x2=genHalf(S,4,107,119,a2,[2,3],true,Object.assign({key:'e2'},P(1-k0)));
+    segs.push({key:'e2',evs:x2,from:105,to:120,label:'نیمه‌ی دوم وقت اضافه',per:'وقت اضافه ۲'});
+  }
+  const tied=S.score[0]===S.score[1];
+  const pens=tied?planPens(S):null;
+  return {T,S,segs,final:S.score.slice(),pens,od};
+}
+
+/* ---------- ضربات پنالتی ---------- */
+function decidedPK(s,n){
+  const l0=Math.max(0,5-n[0]), l1=Math.max(0,5-n[1]);
+  if(n[0]<=5&&n[1]<=5){ if(s[0]>s[1]+l1) return 0; if(s[1]>s[0]+l0) return 1; }
+  if(n[0]>=5&&n[1]>=5&&n[0]===n[1]&&s[0]!==s[1]) return s[0]>s[1]?0:1;
+  return -1;
+}
+function planPens(S){
+  const T=S.T, od=S.od;
+  const pw=od.ps>.5?.5+(od.ps-.5)*.45:.5;
+  let want=chance(pw)?od.strong:1-od.strong;
+  if(hasT(T[0].gk,'pensv')&&!hasT(T[1].gk,'pensv')) want=chance(.58)?0:want;
+  if(hasT(T[1].gk,'pensv')&&!hasT(T[0].gk,'pensv')) want=chance(.58)?1:want;
+  const ord=T.map(X=>{
+    const f=live(X).filter(p=>p.c!=='GK'&&p!==taker(X,'pen')).sort((a,b)=>b.ov-a.ov);
+    return [taker(X,'pen'),...f,X.gk];
+  });
+  let best=null;
+  for(let tries=0;tries<500;tries++){
+    const first=chance(.5)?0:1, s=[0,0], n=[0,0], ks=[]; let win=-1, guard=0;
+    while(win<0&&guard++<60){
+      for(const k of [first,1-first]){
+        const X=T[k], Y=T[1-k], p=ord[k][n[k]%ord[k].length];
+        let ps=.76+(p.ov-90)*.004; if(hasT(p,'penx')) ps+=.1; if(p.c==='GK') ps-=.15;
+        if(hasT(Y.gk,'pensv')) ps-=.1; if(hasT(Y.gk,'reflx')) ps-=.03; ps=Math.max(.5,Math.min(.93,ps));
+        const sc=chance(ps);
+        const s1=s.slice(), n1=n.slice(); n1[k]++; if(sc) s1[k]++;
+        const gW=s.slice(); gW[k]++; const nn=n.slice(); nn[k]++;
+        const winIfGoal=decidedPK(gW,nn)===k, loseIfMiss=decidedPK(s,nn)===1-k;
+        let res='goal';
+        if(!sc) res=chance(hasT(Y.gk,'pensv')?.8:.6)?'save':(chance(.5)?'post':'miss');
+        ks.push({t:k,p,K:Y.gk,res,crit:winIfGoal?'win':loseIfMiss?'must':'',idx:n[k]+1,tn:X.name,after:[...s1]});
+        s[k]=s1[k]; n[k]=n1[k];
+        win=decidedPK(s,n); if(win>=0) break;
+      }
+    }
+    if(win>=0){ best={kicks:ks,winner:win,score:[...s]}; if(win===want) break; }
+  }
+  return best;
+}
+
+/* ================= صفحه‌ی بازی (اسکوربرد، گزارش، پنالتی، پایان) ================= */
+let MT=null, mtEl=null;
+const tcol=t=>colorHex(t)||'#3a4160';
+const tcol2=t=>G.teams[t].color==='black'?'#2a2f45':tcol(t);
+const timers=new Set();
+function later(fn,ms){ const id=setTimeout(()=>{ timers.delete(id); fn(); },ms); timers.add(id); return id; }
+function clearTimers(){ timers.forEach(clearTimeout); timers.clear(); if(MT&&MT.iv){ clearInterval(MT.iv); MT.iv=null; } }
+const $m=s=>mtEl&&mtEl.querySelector(s);
+const mtSig=()=>JSON.stringify([D.pick.map(r=>r.map(x=>x&&x.pid)),D.coach,D.ref,D.pen,D.set,G.teams.map(t=>[t.name,t.color,t.form]),G.coin&&G.coin.winner]);
+function newMT(sig){
+  const plan=planMatch();
+  const pad=plan.segs.map(()=>({sh:[ri(3,6),ri(3,6)],on:[ri(1,3),ri(1,3)],cor:[ri(1,4),ri(1,4)],pos:Math.max(38,Math.min(62,Math.round(50+(plan.T[0].avg-plan.T[1].avg)*1.6+ri(-5,5))))}));
+  return {sig,plan,pad,si:0,ei:0,clock:0,score:[0,0],goals:[],phase:'count',per:'نیمه اول',pk:{i:0,s:[0,0],marks:[[],[]],mode:'ready'},cur:null,iv:null};
+}
+
+/* ---------- اسکوربرد ---------- */
+function sbHTML(){
+  const T=MT.plan.T;
+  const tm=t=>`<div class="sbt t${t}"><i class="sbc" style="--tc:${tcol2(t)}"></i><span>${esc(T[t].name)}</span></div>`;
+  return `<div class="sbl"><span class="live"><i></i>پخش زنده</span><b id="clk" class="clk">${MT.clock}'</b><span id="sbp" class="sbp">${MT.per}</span></div>
+  <div class="sbm">${tm(0)}<div class="sbs"><b id="s0">${MT.score[0]}</b><em>:</em><b id="s1">${MT.score[1]}</b></div>${tm(1)}</div>
+  <div class="sbpk" id="sbpk" hidden></div>`;
+}
+function sbRender(){
+  const sb=$m('#sb'); if(!sb) return;
+  sb.style.setProperty('--c0',tcol2(0)); sb.style.setProperty('--c1',tcol2(1));
+  sb.innerHTML=sbHTML();
+}
+function setClock(m){ MT.clock=m; const c=$m('#clk'); if(c) c.textContent=m+"'"; }
+function setPer(p){ MT.per=p; const e=$m('#sbp'); if(e) e.textContent=p; }
+function setScore(sc,t){
+  MT.score=sc.slice();
+  [0,1].forEach(i=>{ const e=$m('#s'+i); if(!e) return; e.textContent=sc[i]; if(i===t){ e.classList.remove('pop'); void e.offsetWidth; e.classList.add('pop'); } });
+  const sb=$m('#sb'); if(sb){ sb.classList.add('flash'); later(()=>sb.classList.remove('flash'),1800); }
+}
+function setPK(){
+  const e=$m('#sbpk'); if(!e) return; e.hidden=false;
+  const s=MT.pk.s; e.innerHTML=`<b>${s[0]}</b><span>ضربات پنالتی</span><b>${s[1]}</b>`;
+}
+
+/* ---------- نمایش ---------- */
+function view(cls,html){
+  const mv=$m('#mv'); if(!mv) return null;
+  mv.innerHTML=`<div class="v ${cls}">${html}</div>`;
+  return mv.firstElementChild;
+}
+const lockChrome=()=>{ try{chrome()}catch(e){} };
+const BALLTXT=["توپ دست‌به‌دست می‌شود…","هر دو تیم دنبال راهی به سوی دروازه‌اند…","ورزشگاه پر از فریاد و هیجان است…","بازی در جریان است…","نفس‌ها در سینه حبس شده…"];
+
+/* ---------- شروع: ۳ ۲ ۱ ---------- */
+function startCount(){
+  MT.phase='count'; lockChrome();
+  const T=MT.plan.T;
+  const side=t=>`<div class="cn-t"><div class="cn-j" style="--jc:${tcol2(t)}">${JERSEY(t)}</div><b>${esc(T[t].name)}</b><small>${T[t].form.replace(/-/g,'‑')}</small></div>`;
+  view('cnt',`<div class="cn-vs">${side(0)}<div class="cn-x">VS</div>${side(1)}</div><div class="cnum" id="cnum"></div><div class="cn-r">داور بازی: ${esc(REFS[D.ref].fa)}</div>`);
+  Arena.crowd();
+  ['۳','۲','۱'].forEach((s,i)=>later(()=>{ const n=$m('#cnum'); if(!n) return; n.textContent=s; n.className='cnum'; void n.offsetWidth; n.className='cnum pop'; Arena.tick(false); },300+i*950));
+  later(()=>{ const n=$m('#cnum'); if(!n) return; n.textContent='شروع!'; n.className='cnum'; void n.offsetWidth; n.className='cnum pop go'; Arena.start(); },300+3*950);
+  later(beginSeg,300+3*950+1900);
+}
+const seg=()=>MT.plan.segs[MT.si];
+function beginSeg(){
+  const sg=seg(); MT.ei=0; MT.phase='play'; setPer(sg.per);
+  interlude(sg.evs[0].min,()=>showReport(sg.evs[0]));
+}
+
+/* ---------- توپ چرخان و جلو رفتن ساعت ---------- */
+function interlude(target,done){
+  MT.phase='ball'; lockChrome();
+  const T=MT.plan.T;
+  const v=view('bv',`<div class="bring">${ballSVG()}</div><div class="btx" id="btx">${BALLTXT[ri(0,BALLTXT.length-1)]}</div><div class="bsh"></div>`);
+  const mv=$m('#mv'); if(mv){ mv.style.setProperty('--c0',tcol2(0)); mv.style.setProperty('--c1',tcol2(1)); }
+  Arena.calm();
+  const from=MT.clock, steps=Math.max(1,target-from), dur=Math.min(4800,Math.max(2800,steps*110)), step=dur/steps;
+  let cur=from, k=0;
+  later(()=>{
+    MT.iv=setInterval(()=>{
+      cur++; setClock(cur);
+      if(cur>=target){ clearInterval(MT.iv); MT.iv=null; later(done,420); }
+    },step);
+  },500);
+  const tx=setInterval(()=>{ const e=$m('#btx'); if(!e||MT.phase!=='ball'){ clearInterval(tx); return; } k=(k+1)%BALLTXT.length; e.style.opacity=0; setTimeout(()=>{ if(e){ e.textContent=BALLTXT[k]; e.style.opacity=1; } },220); },1700);
+}
+
+/* ---------- صفحه‌ی گزارش ---------- */
+const CUE={yellow:'card',red:'card',injury:'short',offside:'short',varno:'short',penmiss:'short',penno:'short'};
+function showReport(ev){
+  MT.phase='report'; MT.cur=ev; setClock(ev.min); lockChrome();
+  const t=ev.t;
+  let dl=.1; const body=ev.paras.map(p=>{ const ls=p.split('\n').map(l=>{ const s=`<span style="animation-delay:${dl.toFixed(2)}s">${esc(l)}</span>`; dl+=.42; return s; }).join(''); dl+=.25; return `<p>${ls}</p>`; }).join('');
+  view('rp',`<div class="rph"><span class="rpm"><small>دقیقه</small>${fa(ev.min)}</span><span class="rpt"><i class="sbc" style="--tc:${tcol2(t)}"></i>${esc(ev.tn)}</span></div><div class="rpb" id="rpb">${body}</div><button class="cta rd" id="rd">خوندم</button>`);
+  Arena.tense();
+  const c=CUE[ev.type]; if(c) Arena[c]();
+  if(ev.type==='post') later(()=>Arena.clank(),1400);
+  if(ev.type==='save') later(()=>Arena.save(),1400);
+  $m('#rd').onclick=()=>onRead(ev);
+  const rb=$m('#rpb'); const chk=()=>rb.classList.toggle('sc',rb.scrollHeight-rb.scrollTop-rb.clientHeight>8); chk(); rb.addEventListener('scroll',chk);
+}
+function onRead(ev){
+  const b=$m('#rd'); if(!b||b.disabled) return; b.disabled=true;
+  if(ev.type==='goal'){
+    setScore(ev.score,ev.t);
+    MT.goals.push({t:ev.t,nm:ev.B.nm,full:ev.B.p.fa,min:ev.min,gt:ev.gt});
+    Arena.net(); Arena.cheer(true);
+    const v=$m('#mv'); const g=document.createElement('div'); g.className='gbn'; g.style.setProperty('--tc',tcol2(ev.t));
+    g.innerHTML=`<b>گوووول!</b><strong>${esc(ev.B.p.fa)}</strong><span>${esc(ev.tn)} · دقیقه ${fa(ev.min)}</span>`;
+    if(v) v.appendChild(g);
+    later(()=>{ g.remove(); afterRead(); },3100);
+  } else if(ev.type==='offside'||ev.type==='varno'){
+    Arena.groan();
+    const v=$m('#mv'); const g=document.createElement('div'); g.className='gbn no'; 
+    g.innerHTML=`<b>گل مردود شد!</b><span>${ev.type==='offside'?'آفساید':'بررسی VAR'}</span>`;
+    if(v) v.appendChild(g);
+    later(()=>{ g.remove(); afterRead(); },2200);
+  } else {
+    if(ev.type==='save'||ev.type==='post'||ev.type==='clear'||ev.type==='miss') Arena.gasp();
+    else if(ev.type==='penmiss') Arena.groan();
+    later(afterRead,400);
+  }
+}
+function afterRead(){
+  const sg=seg(); MT.ei++;
+  if(MT.ei<sg.evs.length){ const e=sg.evs[MT.ei]; interlude(e.min,()=>showReport(e)); }
+  else interlude(sg.to,segEnd);
+}
+
+/* ---------- آمار ---------- */
+function statsUpTo(n){
+  const o={sh:[0,0],on:[0,0],cor:[0,0],cd:[0,0],pos:0};
+  for(let i=0;i<=n;i++){
+    const sg=MT.plan.segs[i], pd=MT.pad[i];
+    [0,1].forEach(t=>{ o.sh[t]+=pd.sh[t]; o.on[t]+=pd.on[t]; o.cor[t]+=pd.cor[t]; });
+    o.pos+=pd.pos;
+    sg.evs.forEach(e=>{
+      const t=e.t;
+      if(['goal','save','post','block','miss','duel','clear','offside','fkmiss'].includes(e.type)) o.sh[t]++;
+      if(e.type==='goal'||e.type==='save') o.on[t]++;
+      if(e.type==='corner') o.cor[t]++;
+      if(e.type==='yellow') o.cd[1-t]++;
+      if(e.type==='red') o.cd[1-t]+=2;
+    });
+  }
+  o.pos=Math.round(o.pos/(n+1));
+  return o;
+}
+function statRows(n){
+  const s=statsUpTo(n), T=MT.plan.T;
+  const row=(lab,a,b,pc)=>{ const tot=(a+b)||1, pa=pc?a:Math.round(a/tot*100);
+    return `<div class="st"><b>${fa(a)}${pc?'٪':''}</b><span>${lab}</span><b>${fa(b)}${pc?'٪':''}</b><div class="stb"><i style="width:${pa}%;background:${tcol2(0)}"></i><i style="width:${100-pa}%;background:${tcol2(1)}"></i></div></div>`; };
+  return row('مالکیت توپ',s.pos,100-s.pos,true)+row('شوت',s.sh[0],s.sh[1])+row('شوت در چارچوب',Math.min(s.on[0],s.sh[0]),Math.min(s.on[1],s.sh[1]))+row('کرنر',s.cor[0],s.cor[1])+row('کارت',s.cd[0],s.cd[1]);
+}
+const gtTag=g=>g==='pen'?' (پنالتی)':g==='fk'?' (ضربه‌ی آزاد)':'';
+function goalList(){
+  const T=MT.plan.T;
+  if(!MT.goals.length) return '<div class="gl0">هنوز گلی به ثمر نرسیده است</div>';
+  return [0,1].map(t=>{
+    const gs=MT.goals.filter(g=>g.t===t);
+    return `<div class="glc"><b><i class="sbc" style="--tc:${tcol2(t)}"></i>${esc(T[t].name)}</b>${gs.length?gs.map(g=>`<span>⚽ ${esc(g.full)} ${fa(g.min)}'${gtTag(g.gt)}</span>`).join(''):'<span class="mu">—</span>'}</div>`;
+  }).join('');
+}
+
+/* ---------- پایان نیمه‌ها ---------- */
+function breakView(title,sub,btn,onGo,n){
+  MT.phase='break'; lockChrome();
+  view('brk',`<div class="bk"><h2>${title}</h2><p>${sub}</p><div class="bks"><b>${MT.score[0]}</b><em>:</em><b>${MT.score[1]}</b></div>
+   <div class="gls">${goalList()}</div><div class="sts">${statRows(n)}</div></div><button class="cta" id="bkb">${btn}</button>`);
+  $m('#bkb').onclick=()=>{ $m('#bkb').disabled=true; onGo(); };
+}
+function segEnd(){
+  const sg=seg(), last=MT.si===MT.plan.segs.length-1, tied=MT.score[0]===MT.score[1];
+  Arena.tense();
+  if(sg.key==='h1'){
+    Arena.half();
+    breakView('پایان نیمه‌ی اول','داور بازیکنان را به رختکن می‌فرستد','شروع نیمه‌ی دوم',()=>{ MT.si++; setClock(45); beginSeg(); },MT.si);
+  } else if(sg.key==='h2'){
+    Arena.end();
+    if(!tied) later(finish,1500);
+    else breakView('پایان ۹۰ دقیقه','نتیجه مساوی است؛ بازی به وقت اضافه می‌رود','شروع وقت اضافه',()=>{ MT.si++; beginSeg(); },MT.si);
+  } else if(sg.key==='e1'){
+    Arena.half();
+    breakView('پایان نیمه‌ی اول وقت اضافه','پانزده دقیقه‌ی پایانی در راه است','شروع نیمه‌ی دوم وقت اضافه',()=>{ MT.si++; beginSeg(); },MT.si);
+  } else {
+    Arena.end();
+    if(!tied) later(finish,1500);
+    else breakView('پایان وقت اضافه','هنوز مساوی! تکلیف بازی با ضربات پنالتی روشن می‌شود','ضربات پنالتی',pensIntro,MT.si);
+  }
+}
+
+/* ---------- ضربات پنالتی ---------- */
+const PKT={
+ goal:["{P} پشت توپ… یه نفس عمیق…\nمی‌دوه… ضربه!\nگوشه‌ی چپ! {K} رفت اون طرف! گل!",
+       "{P} پشت توپ…\nمی‌کوبه گوشه‌ی بالا!\n{K} حتی نمی‌رسه! گل!",
+       "{P} آروم می‌دوه…\nوسط دروازه!\n{K} از قبل پریده بود! گل!",
+       "{P} بی‌معطلی…\nگوشه‌ی پایین راست!\n{K} دستشو رسوند… ولی نه! گل!"],
+ save:["{P} پشت توپ…\nضربه به گوشه…\n{K} درست حدس زد!! سیو!",
+       "{P} می‌دوه… شوت!\n{K} شیرجه‌ی بلند…\nبیرونش انداخت! سیو!",
+       "{P} محکم می‌زنه…\n{K} با دست دفعش کرد!! سیو!"],
+ miss:["{P} پشت توپ…\nشوت… بالای دروازه!!\nاز دست رفت!",
+       "{P} می‌دوه…\nضربه… کنار تیرک… بیرون!\nباورنکردنیه!"],
+ post:["{P} پشت توپ…\nمی‌کوبه… تیرک!!\nتوپ برگشت بیرون! نشد!"]
+};
+const RESLAB={goal:'گل',save:'سیو',miss:'بیرون',post:'تیرک'};
+function pensIntro(){
+  MT.phase='pens'; setPer('ضربات پنالتی'); lockChrome(); setPK();
+  const T=MT.plan.T, pl=MT.plan.pens, f=pl.kicks[0].t;
+  Arena.drum();
+  view('pki',`<div class="pk0"><div class="pk0t">ضربات پنالتی</div><p>بازی مساوی تمام شد و حالا قهرمان از روی نقطه‌ی پنالتی معلوم می‌شود. اول از همه ${esc(T[f].name)} شروع می‌کند و ضربه‌ی اولش را ${esc(pl.kicks[0].p.nm)}، پنالتی‌زن منتخب، می‌زند.</p></div><button class="cta" id="pkg">شروع ضربات</button>`);
+  $m('#pkg').onclick=()=>pkRender('ready');
+}
+function pkDots(t,cur){
+  const m=MT.pk.marks[t], n=Math.max(5,m.length+(cur===t?1:0),MT.pk.marks[1-t].length);
+  return Array.from({length:n},(_,i)=>{ const r=m[i]; return `<i class="${r?(r==='goal'?'g':'x'):(cur===t&&i===m.length?'cur':'')}">${r?(r==='goal'?'✓':'✗'):''}</i>`; }).join('');
+}
+function pkRender(mode,k){
+  const pl=MT.plan.pens, T=MT.plan.T, i=MT.pk.i, kk=pl.kicks[i];
+  MT.phase='pens'; setPK();
+  const tr=t=>`<div class="pkr"><span class="pkn"><i class="sbc" style="--tc:${tcol2(t)}"></i>${esc(T[t].name)}</span><span class="pkd">${pkDots(t,mode==='ready'?kk.t:-1)}</span></div>`;
+  const crit=mode==='ready'?(kk.crit==='win'?'اگر این ضربه گل شود، '+T[kk.t].name+' برنده است!':kk.crit==='must'?'اگر این ضربه گل نشود، بازی تمام است!':''):'';
+  let mid;
+  if(mode==='ready'){
+    mid=`<div class="pkc"><div class="pkl">ضربه‌ی ${fa(kk.idx)} · ${esc(kk.tn)}</div><div class="pkp" style="--jc:${tcol2(kk.t)}">${JERSEY(kk.t)}<b>${esc(kk.p.p.fa)}</b></div><div class="pkk">دروازه‌بان: ${esc(kk.K.p.fa)}</div>${crit?`<div class="pkcr">${esc(crit)}</div>`:''}<div class="pkball" id="pkball">${ballSVG()}</div></div>`;
+  } else {
+    const raw=say(PKT[kk.res]); CX.P=kk.p.nm; CX.K=kk.K.nm; const txt=F(raw);
+    mid=`<div class="pkc res ${kk.res}"><div class="pkl">ضربه‌ی ${fa(kk.idx)} · ${esc(kk.tn)}</div><div class="pkbadge">${RESLAB[kk.res]}</div><div class="pkp" style="--jc:${tcol2(kk.t)}">${JERSEY(kk.t)}<b>${esc(kk.p.p.fa)}</b></div><p class="pkt">${txt.split('\n').map((l,j)=>`<span style="animation-delay:${(j*.4).toFixed(1)}s">${esc(l)}</span>`).join('')}</p></div>`;
+  }
+  const last=mode==='shown'&&i===pl.kicks.length-1;
+  view('pkv',`<div class="pktr">${tr(0)}${tr(1)}</div>${mid}<button class="cta" id="pkb">${mode==='ready'?'ضربه!':last?'اعلام نتیجه':'ضربه‌ی بعدی'}</button>`);
+  $m('#pkb').onclick=()=>{
+    const b=$m('#pkb'); if(!b||b.disabled) return; b.disabled=true;
+    if(mode==='ready') pkKick(kk);
+    else if(last) finish(); else { MT.pk.i++; pkRender('ready'); }
+  };
+}
+function pkKick(kk){
+  const ball=$m('#pkball'); if(ball) ball.classList.add('fly');
+  Arena.drum(); later(()=>Arena.kick(),500);
+  later(()=>{
+    MT.pk.marks[kk.t].push(kk.res==='goal'?'goal':'x');
+    if(kk.res==='goal'){ MT.pk.s[kk.t]++; Arena.net(); Arena.cheer(false); }
+    else if(kk.res==='save'){ Arena.save(); Arena.gasp(); }
+    else if(kk.res==='post'){ Arena.clank(); Arena.groan(); }
+    else Arena.groan();
+    pkRender('shown');
+  },1150);
+}
+
+/* ---------- پایان بازی ---------- */
+function motm(){
+  const all=MT.plan.T.flatMap(X=>X.players.map(p=>({p,X})));
+  const win=winnerIdx();
+  let best=null,bv=-1e9;
+  all.forEach(o=>{ const v=o.p.rate+(o.X.t===win?1.2:0)+o.p.ov/200+Math.random()*.3; if(v>bv){ bv=v; best=o; } });
+  return best;
+}
+function winnerIdx(){
+  if(MT.score[0]!==MT.score[1]) return MT.score[0]>MT.score[1]?0:1;
+  return MT.plan.pens?MT.plan.pens.winner:0;
+}
+function finish(){
+  MT.phase='final'; setPer('پایان بازی'); lockChrome();
+  const T=MT.plan.T, w=winnerIdx(), pens=MT.plan.pens&&MT.score[0]===MT.score[1];
+  const m=motm();
+  const why=[]; if(m.p.goals) why.push(fa(m.p.goals)+' گل'); if(m.p.ast) why.push(fa(m.p.ast)+' پاس گل'); if(m.p.sv) why.push(fa(m.p.sv)+' سیو'); if(!why.length) why.push('درخشش در کل بازی');
+  const conf=Array.from({length:34},(_,i)=>`<i style="left:${ri(2,98)}%;--d:${(Math.random()*1.6).toFixed(2)}s;--t:${(2.6+Math.random()*2).toFixed(1)}s;background:${[tcol(w),'#f6c453','#ffffff','#ff6a2b'][i%4]}"></i>`).join('');
+  const pk=pens?`<div class="fpk"><b>${MT.plan.pens.score[0]}</b><span>ضربات پنالتی</span><b>${MT.plan.pens.score[1]}</b></div>`:'';
+  view('fin',`<div class="conf">${conf}</div><div class="fsc">
+    <div class="fcup">🏆</div><div class="fttl">پایان بازی</div>
+    <div class="fwin" style="--tc:${tcol2(w)}"><i class="sbc" style="--tc:${tcol2(w)}"></i>${esc(T[w].name)} برنده شد!</div>
+    <div class="bks"><b>${MT.score[0]}</b><em>:</em><b>${MT.score[1]}</b></div>${pk}
+    <div class="gls">${goalList()}</div>
+    <div class="mom"><div class="momj" style="--jc:${tcol2(m.X.t)}">${JERSEY(m.X.t)}</div><div><small>بهترین بازیکن زمین</small><b>${esc(m.p.p.fa)}</b><span>${esc(why.join(' · '))}</span></div></div>
+    <div class="sts">${statRows(MT.plan.segs.length-1)}</div>
+    <div class="fbt"><button class="cta" id="again">بازی دوباره با همین ترکیب‌ها</button><button class="ghost" id="fresh">شروع از اول</button></div></div>`);
+  Arena.crowd(); Arena.end(); later(()=>{ Arena.fanfare(); },1300); later(()=>Arena.crowdOff(),9000);
+  $m('#again').onclick=()=>{ MT=null; clearTimers(); paint(0); };
+  let armed=false;
+  $m('#fresh').onclick=()=>{ const b=$m('#fresh'); if(!armed){ armed=true; b.textContent='مطمئنی؟ دوباره بزن'; later(()=>{ armed=false; if(b) b.textContent='شروع از اول'; },3500); } else location.reload(); };
+}
+
+/* ---------- ورود به صفحه ---------- */
+SCREENS.match=el=>{
+  el.classList.add('mt');
+  const sig=mtSig();
+  if(!MT||MT.sig!==sig){ clearTimers(); MT=newMT(sig); }
+  mtEl=el;
+  el._off=()=>{ clearTimers(); Arena.crowdOff(); mtEl=null; };
+  el.innerHTML=`<div class="sb" id="sb"></div><div class="mv" id="mv"></div>`;
+  sbRender();
+  if(MT.phase==='final'){ finish(); return; }
+  MT.clock=0; MT.score=[0,0]; MT.goals=[]; MT.si=0; MT.ei=0; MT.per='نیمه اول'; MT.pk={i:0,s:[0,0],marks:[[],[]],mode:'ready'};
+  sbRender();
+  startCount();
+};
+Object.assign(STEPS[5],{ lock:()=>!!MT&&MT.phase!=='final', ok:()=>true, cta:'پایان' });
+
+
+function placeholder(st,i){
+  return `<div class="card"><div class="num">${fa(i+1)}</div><h2>${st.label}</h2><p>${st.hint||''}</p><span class="soon">به‌زودی</span></div>`;
+}
+
+/* ================= قاب و ناوبری ================= */
+function chrome(){
+  const st=STEPS[state.step], last=state.step===STEPS.length-1;
+  const okNow=st.ok?st.ok():true;
+  lab.querySelector('b').textContent=st.label;
+  lab.querySelector('small').textContent=`مرحله‌ی ${fa(state.step+1)} از ${fa(STEPS.length)}`;
+  [...dots.children].forEach((d,i)=>{ d.className=i===state.step?'on':(i<=state.max?'seen':''); });
+  btnBack.disabled=ui.busy||state.step===0||!!(st.lock&&st.lock());
+  btnFwd.disabled=ui.busy||state.step>=state.max||!okNow;
+  const label=typeof st.cta==='function'?st.cta():(st.cta||'بعدی');
+  btnNext.textContent=last?'پایان':label;
+  btnNext.disabled=ui.busy||last||!okNow;
+  if(st.btn){ const b=st.btn(); btnNext.textContent=b.label; btnNext.disabled=ui.busy||last||!b.enabled; }
+  if(st.ttl) lab.querySelector('b').textContent=st.ttl();
+}
+function paint(dir){
+  const old=stage.firstElementChild; if(old&&old._off){ try{old._off()}catch(e){} }
+  const st=STEPS[state.step];
+  const el=document.createElement('section');
+  el.className='screen '+(dir>0?'in-fwd':dir<0?'in-back':'in-first');
+  (SCREENS[st.id]||(e=>{e.innerHTML=placeholder(st,state.step);}))(el);
+  document.body.dataset.step=st.id;
+  try{Music.hold(st.id==='match')}catch(e){}
+  stage.replaceChildren(el);
+  chrome();
+}
+function go(to){
+  if(ui.busy||to<0||to>=STEPS.length||to===state.step) return;
+  if(to>state.step){ const st=STEPS[state.step]; if(st.ok&&!st.ok()) return; }
+  const dir=to>state.step?1:-1;
+  state.step=to; state.max=Math.max(state.max,to); paint(dir);
+}
+btnNext.addEventListener('click',()=>{
+  if(ui.busy) return;
+  const st=STEPS[state.step];
+  if(st.action&&st.action()) return;
+  go(state.step+1);
+});
+btnBack.addEventListener('click',()=>go(state.step-1));
+btnFwd.addEventListener('click',()=>go(state.step+1));
+addEventListener('keydown',e=>{
+  if(e.target.matches&&e.target.matches('input,textarea')) return;
+  if(e.key==='ArrowLeft') go(state.step+1);
+  if(e.key==='ArrowRight') go(state.step-1);
+});
+
+/* ================= تنظیمات ================= */
+const sheet=$('#sheet'), sw=$('#swMusic');
+const syncSw=()=>sw.setAttribute('aria-checked',String(Music.on()));
+function openSheet(){ sheet.hidden=false; requestAnimationFrame(()=>requestAnimationFrame(()=>sheet.classList.add('open'))); }
+function closeSheet(){ sheet.classList.remove('open'); setTimeout(()=>{sheet.hidden=true},240); }
+$('#btnSettings').addEventListener('click',openSheet);
+sheet.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeSheet(); });
+sw.addEventListener('click',()=>{ Music.set(!Music.on()); syncSw(); });
+syncSw();
+const swA=$('#swArena');
+swA.addEventListener('click',()=>{ Arena.set(!Arena.on()); swA.setAttribute('aria-checked',String(Arena.on())); if(Arena.on()&&mtEl&&MT&&MT.phase!=='final') Arena.crowd(); });
+
+// مرورگرها اجازه‌ی پخش صدا رو فقط بعد از اولین لمس می‌دن
+const UNLOCK=['click','touchend','pointerup','keydown'];
+function onGesture(){
+  try{Music.start()}catch(e){} try{Arena.unlock()}catch(e){}
+  setTimeout(()=>{ if(Music.playing()) UNLOCK.forEach(e=>removeEventListener(e,onGesture,true)); },500);
+}
+UNLOCK.forEach(e=>addEventListener(e,onGesture,true));
+
+paint(0);
+})();
+</script>
+</body>
+</html>
